@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA Enterprise Dashboard - Secure Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: {} } }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- CryptoJS untuk Enkripsi Standar Militer AES-256 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    <style>
+        :root { color-scheme: light; }
+        html.dark { color-scheme: dark; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark-scroll::-webkit-scrollbar-thumb { background: #475569; }
+        .dark-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .status-pill { padding: 4px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .wa-bubble { position: relative; background: #dcf8c6; border-radius: 8px; padding: 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .wa-bubble::after { content: ''; position: absolute; right: -8px; top: 0; width: 0; height: 0; border: 10px solid transparent; border-top-color: #dcf8c6; border-right: 0; margin-top: 0; margin-bottom: auto; }
+        
+        .dark .wa-bubble { background: #005c4b; color: #e9edef; }
+        .dark .wa-bubble::after { border-top-color: #005c4b; }
+        .dark .wa-bubble p { color: #e9edef !important; }
+        .dark .wa-bubble .text-\[\#667781\] { color: #8696a0 !important; }
+
+        .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
+
+        /* Smooth Progress Bar Transitions */
+        #spamProgress, #healthProgressBar { transition: width 0.4s ease, background-color 0.4s ease; }
+        
+        /* Custom SweetAlert Z-Index for Modal Overlaps */
+        .swal2-container { z-index: 10000 !important; }
+    </style>
+    
+    <script>
+        if (localStorage.getItem('wa_theme') === 'dark' || (!('wa_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 h-screen overflow-hidden flex font-sans text-slate-800 dark:text-slate-200 selection:bg-indigo-200 dark:selection:bg-indigo-900 transition-colors duration-300 relative">
+
+    <!-- ========================================== -->
+    <!-- AUTHENTICATION MODAL (LOGIN / REGISTER)    -->
+    <!-- ========================================== -->
+    <div id="authModal" class="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all relative">
+            
+            <div class="bg-emerald-600 dark:bg-emerald-700 p-6 text-center relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-20 animate-pulse">
+                    <svg class="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                </div>
+                <div class="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-full mb-3 shadow-inner relative z-10">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-white tracking-tight relative z-10">WA Engine Pro</h2>
+                <p class="text-emerald-200 text-xs mt-1 font-mono tracking-widest relative z-10">SECURE SAAS EDITION</p>
+            </div>
+
+            <div class="p-6 sm:p-8">
+                <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg mb-6">
+                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-bold bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 rounded-md shadow-sm transition-all">Masuk</button>
+                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md transition-all">Daftar</button>
+                </div>
+
+                <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+                    <div id="nameField" class="hidden">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
+                        <input type="text" id="authName" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Email / Username</label>
+                        <input type="text" id="authEmail" required class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="admin@domain.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+                        <input type="password" id="authPassword" required class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" id="authSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition-all mt-4 flex justify-center items-center gap-2">
+                        <span id="authSubmitText">Masuk ke Dashboard</span>
+                        <svg id="authLoading" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </button>
+                </form>
+                <div class="mt-4 flex justify-center items-center gap-1.5 opacity-60">
+                    <svg class="w-3 h-3 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    <span class="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">End-to-End Encrypted Session</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL BLACKLIST (OPT-OUT MANAGEMENT)       -->
+    <!-- ========================================== -->
+    <div id="blacklistModal" class="fixed inset-0 z-[110] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all relative flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
+                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Kelola Daftar Hitam (Blacklist)
+                </h3>
+                <button onclick="closeBlacklist()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-5 overflow-y-auto">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Masukkan nomor WhatsApp pelanggan yang meminta berhenti berlangganan (Opt-out). Sistem akan mengabaikan pengiriman ke nomor-nomor ini secara otomatis.</p>
+                <textarea id="blacklistInput" rows="8" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:ring-red-500 focus:border-red-500 p-3 text-sm shadow-sm dark:shadow-inner transition-colors font-mono" placeholder="08123456789&#10;628987654321&#10;... (pisahkan dengan baris baru atau koma)"></textarea>
+                <div class="mt-2 flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-slate-500" id="blacklistCount">Total Terdaftar: 0</span>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex justify-end gap-2">
+                <button onclick="closeBlacklist()" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors">Batal</button>
+                <button onclick="saveBlacklist()" class="px-4 py-2 text-xs font-bold bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-md transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> Simpan Blacklist</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDEBAR: CONFIGURATION WORKSPACE      -->
+    <!-- ========================================== -->
+    <aside class="w-80 md:w-[22rem] flex-shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 flex flex-col h-full shadow-2xl z-20 relative overflow-hidden transition-colors duration-300 border-r border-slate-200 dark:border-slate-900">
+        
+        <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/80 dark:bg-slate-950/50 transition-colors duration-300">
+            <div class="bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-lg relative transition-colors duration-300">
+                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 animate-pulse"></div>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800 dark:text-white leading-tight transition-colors">WA Engine Pro</h1>
+                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold tracking-widest transition-colors">AES-256 ENCRYPTED</p>
+            </div>
+        </div>
+
+        <!-- Sidebar Body (Scrollable) -->
+        <div class="flex-1 overflow-y-auto dark-scroll p-5 space-y-6">
+            
+            <!-- 1. Campaign Profile -->
+            <div>
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Profil Workspace</label>
+                    <div class="flex gap-1">
+                        <button onclick="saveCampaignProfile()" class="text-[10px] bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500 hover:text-indigo-800 dark:hover:text-white px-2 py-1 rounded transition border border-indigo-200 dark:border-indigo-500/30 font-medium">Simpan</button>
+                        <button onclick="deleteCampaignProfile()" class="text-[10px] bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-500 hover:text-red-800 dark:hover:text-white px-2 py-1 rounded transition border border-red-200 dark:border-red-500/30 font-medium">Hapus</button>
+                    </div>
+                </div>
+                <select id="campaignSelect" onchange="loadCampaignProfile()" class="w-full text-sm border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 py-2 cursor-pointer shadow-sm dark:shadow-inner transition-colors">
+                    <option value="">-- Pilih Profil Kampanye --</option>
+                </select>
+            </div>
+
+            <!-- API KLIEN UNTUK DATA KONTAK -->
+            <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                <label class="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 transition-colors">
+                    <span class="flex items-center gap-1"><svg class="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> Database Kontak Klien</span>
+                    <button type="button" onclick="testClientApi()" class="text-[9px] font-bold text-indigo-500 hover:text-indigo-600 underline">Test Ping</button>
+                </label>
+                <input type="url" id="userApiUrl" placeholder="Paste URL Web App Google Sheets Anda..." class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 text-indigo-900 dark:text-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 p-2 text-xs shadow-sm transition-colors placeholder-indigo-300 dark:placeholder-indigo-700/50">
+            </div>
+
+            <!-- MODE PENGIRIMAN -->
+            <div class="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800 mt-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 transition-colors">🚀 Metode Pengiriman</label>
+                    <select id="sendMode" onchange="toggleSendMode()" class="w-full text-xs font-bold border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 py-2 cursor-pointer shadow-sm dark:shadow-inner transition-colors">
+                        <option value="wa_web">WA Web / Desktop (Gratis & Otomatis)</option>
+                        <option value="meta_api">Meta Cloud API (Resmi & Anti-Banned)</option>
+                    </select>
+                </div>
+
+                <!-- Teks Utama (Digunakan oleh Keduanya) -->
+                <div>
+                    <label class="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 transition-colors">
+                        <span>📝 Teks Utama / Variabel Meta</span>
+                        <span class="text-emerald-600 dark:text-emerald-400 font-normal normal-case">Spintax & Variabel</span>
+                    </label>
+                    <textarea id="message" oninput="analyzeSpamScore()" rows="5" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm shadow-sm dark:shadow-inner transition-colors placeholder-slate-400 dark:placeholder-slate-600" placeholder="{Halo|Hai} {nama}, ..."></textarea>
+                    
+                    <div id="waWebConfig" class="mt-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 shadow-sm transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase flex items-center gap-1 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                Spam Risk Analyzer
+                            </span>
+                            <span id="spamScoreText" class="text-xs font-bold text-emerald-500">0% (Aman)</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden transition-colors">
+                            <div id="spamProgress" class="bg-emerald-500 h-1.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p id="spamAdvice" class="text-[9px] text-slate-500 dark:text-slate-400 mt-1.5 leading-tight italic transition-colors">Tulis pesan untuk melihat analisis heuristik otomatis.</p>
+                    </div>
+                </div>
+
+                <!-- URL Lampiran (Dinamis) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🔗 URL Lampiran (Mendukung Variabel)</label>
+                        <input type="text" id="mediaUrl" placeholder="https://domain.com/file_{resi}.pdf" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors font-mono">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🛡️ Fallback {nama}</label>
+                        <input type="text" id="fallbackName" value="Bapak/Ibu" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors">
+                    </div>
+                </div>
+
+                <!-- Opsi 2: Pengaturan Meta API -->
+                <div id="metaApiConfig" class="hidden space-y-3 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/30 p-3 rounded-lg shadow-sm relative overflow-hidden mt-3">
+                    <div class="absolute -right-4 -top-4 opacity-10 pointer-events-none">
+                        <svg class="w-20 h-20 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                    </div>
+                    <div class="relative z-10">
+                        <label class="flex justify-between items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">
+                            <span class="flex items-center gap-1">🔑 Meta Access Token</span>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="testMetaApi()" class="text-emerald-600 hover:text-emerald-800 font-bold underline">Test Ping</button>
+                                <a href="https://developers.facebook.com/apps/creation/" target="_blank" class="text-indigo-500 hover:text-indigo-600 font-normal underline">Buat App</a>
+                            </div>
+                        </label>
+                        <input type="password" id="metaToken" placeholder="EAA..." class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 relative z-10">
+                        <div>
+                            <label class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">📱 Phone Number ID</label>
+                            <input type="text" id="metaPhoneId" placeholder="1234567890" class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 shadow-sm transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">📋 Nama Template</label>
+                            <input type="text" id="metaTemplateName" placeholder="promo_januari" class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 shadow-sm transition-colors">
+                        </div>
+                    </div>
+                    <div class="relative z-10 pt-2 border-t border-emerald-200/50 dark:border-emerald-800/50 mt-2">
+                        <label class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">🔘 Parameter Tombol Dinamis (Opsional)</label>
+                        <input type="text" id="metaButtonParam" placeholder="Isi variabel tombol (misal: {resi})" class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 shadow-sm transition-colors font-mono">
+                    </div>
+                    <p class="text-[8px] text-emerald-700 dark:text-emerald-400 leading-tight relative z-10 mt-2 font-medium">INFO PENTING: Untuk Meta API, kolom <strong>Teks Utama</strong> di atas hanya digunakan untuk mendeteksi Variabel secara berurutan. Misalnya jika template Anda butuh variabel nama & resi, cukup ketik: <code class="bg-emerald-100 dark:bg-emerald-800 px-1 rounded">{nama} pesanan {resi}</code>.</p>
+                </div>
+
+            </div>
+
+            <!-- KEAMANAN & KEPATUHAN (BLACKLIST) -->
+            <div class="space-y-4 bg-slate-50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-inner transition-colors mt-3">
+                <h3 class="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 transition-colors">
+                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Keamanan & Kepatuhan
+                </h3>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Blacklist (Opt-out)</label>
+                        <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Abaikan pengiriman ke pelanggan tertentu.</p>
+                    </div>
+                    <button onclick="openBlacklist()" class="text-[10px] bg-white dark:bg-slate-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800 shadow-sm transition font-bold">Kelola Blacklist</button>
+                </div>
+            </div>
+
+            <!-- 3. ULTIMATE ANTI-BAN MODULE -->
+            <div id="antiBanModule" class="space-y-4 bg-slate-50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-inner transition-colors mt-3">
+                <h3 class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 transition-colors">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Ultimate Anti-Ban (Khusus WA Web)
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Zero-Width Hash Breaker</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Menyisipkan karakter transparan untuk memanipulasi & memecah pola Hash ID pada server Meta.</p>
+                        </div>
+                        <div class="relative inline-block w-10 flex-shrink-0 align-middle select-none transition duration-200 ease-in mt-0.5">
+                            <input type="checkbox" id="useZeroWidth" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="useZeroWidth" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Typing Speed Simulator</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Tambahkan ekstra delay otomatis berdasarkan jumlah karakter untuk meniru durasi ketikan manusia asli.</p>
+                        </div>
+                        <div class="relative inline-block w-10 flex-shrink-0 align-middle select-none transition duration-200 ease-in mt-0.5">
+                            <input type="checkbox" id="useTypingSpeed" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="useTypingSpeed" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Mode Pemanasan (Warm-up)</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Melipatgandakan (x2) durasi delay pada 20 antrean pertama agar aman untuk nomor WhatsApp baru.</p>
+                        </div>
+                        <div class="relative inline-block w-10 flex-shrink-0 align-middle select-none transition duration-200 ease-in mt-0.5">
+                            <input type="checkbox" id="useWarmup" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="useWarmup" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200 dark:border-slate-700 mt-3 transition-colors">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Jam Operasional</label>
+                        <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1.5 leading-tight transition-colors">Sistem otomatis tidur jika di luar jam.</p>
+                        <div class="flex items-center gap-1 bg-white dark:bg-slate-800 rounded px-1 border border-slate-300 dark:border-slate-700 shadow-sm transition-colors">
+                            <input type="time" id="workStart" value="07:00" class="w-full bg-transparent border-none text-[10px] text-slate-800 dark:text-white p-1 focus:ring-0">
+                            <span class="text-slate-400 dark:text-slate-500 font-bold">-</span>
+                            <input type="time" id="workEnd" value="22:00" class="w-full bg-transparent border-none text-[10px] text-slate-800 dark:text-white p-1 focus:ring-0">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Wajib Intervensi</label>
+                        <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1.5 leading-tight transition-colors">Jeda otomatis pengamanan rasio Inbound.</p>
+                        <input type="number" id="interventionLimit" value="40" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-200 dark:border-slate-700 mt-2 transition-colors">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Min. Delay</label>
+                        <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1 leading-tight">Waktu batas bawah.</p>
+                        <input type="number" id="minDelay" value="15" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Max. Delay</label>
+                        <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1 leading-tight">Waktu batas atas.</p>
+                        <input type="number" id="maxDelay" value="45" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Batch / Rest</label>
+                        <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1 leading-tight">Batas Pesan / Durasi (Mnt).</p>
+                        <div class="flex border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden shadow-sm transition-colors">
+                            <input type="number" id="batchSize" value="50" class="w-1/2 bg-transparent text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center border-r border-slate-200 dark:border-slate-700 focus:ring-0 transition-colors" title="Pesan per Batch">
+                            <input type="number" id="restTime" value="10" class="w-1/2 bg-transparent text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-0 transition-colors" title="Menit Istirahat">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Scheduler -->
+            <div class="pb-4">
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 transition-colors">⏰ Penjadwalan Sesi (Opsional)</label>
+                <input type="datetime-local" id="scheduleTime" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-300 p-2 text-xs focus:ring-indigo-500 shadow-sm transition-colors cursor-pointer">
+            </div>
+            
+        </div>
+
+        <!-- TOMBOL KELUAR / LOGOUT (SIDEBAR BOTTOM) -->
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 transition-colors duration-300 mt-auto">
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-lg transition-all shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Keluar Aplikasi
+            </button>
+        </div>
+
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- MAIN CONTENT: EXECUTION & MONITORING       -->
+    <!-- ========================================== -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-[#f4f7fb] dark:bg-slate-950 transition-colors duration-300">
+        
+        <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex-shrink-0 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 z-10 shadow-sm transition-colors duration-300">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center font-bold shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">Console Analytics</h2>
+                        <div id="statusBadge" class="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500"></span> STANDBY
+                        </div>
+                    </div>
+                    <!-- ETA BADGE -->
+                    <div id="etaBadge" class="hidden mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-l border-slate-300 dark:border-slate-700 pl-3 ml-1">
+                        <svg class="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span id="etaTime">ETA: -</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar Grouping -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                
+                <!-- Theme Toggle -->
+                <button onclick="toggleTheme()" class="p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-full transition-colors focus:outline-none" title="Ganti Tema Visual">
+                    <svg id="themeIconLight" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="themeIconDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+
+                <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
+                <!-- Account Badge -->
+                <div id="userProfileBadge" class="hidden items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-lg">
+                    <div class="w-6 h-6 rounded-full bg-indigo-200 dark:bg-indigo-700 flex items-center justify-center text-indigo-700 dark:text-indigo-200 text-[10px] font-bold" id="userInitial">A</div>
+                    <div class="hidden md:block">
+                        <p class="text-[10px] font-bold text-indigo-900 dark:text-indigo-200 leading-tight" id="userNameDisplay">Admin</p>
+                        <p class="text-[8px] text-indigo-500 dark:text-indigo-400 leading-tight">Administrator</p>
+                    </div>
+                </div>
+
+                <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
+                <!-- Recover Crash Button -->
+                <button id="btnRecover" onclick="recoverSession()" class="hidden bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-md shadow-sm font-bold transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span class="hidden sm:inline">Pulihkan Crash</span>
+                </button>
+
+                <!-- Segmented Control Toolbar (Export & Import) -->
+                <div class="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700/80 transition-colors">
+                    
+                    <button onclick="exportCSV()" id="btnExport" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white rounded-md transition-all disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed" disabled title="Download Laporan">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span class="hidden md:inline">Export</span>
+                    </button>
+                    
+                    <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                    
+                    <div class="relative">
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                        <button onclick="document.getElementById('csvFileInput').click()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-teal-600 dark:hover:text-teal-400 rounded-md transition-all" title="Upload Database Lokal">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <span class="hidden md:inline">Import CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Primary Call-to-Action (Sinkronisasi Sheet) -->
+                <button onclick="fetchDataFromSheet()" id="btnLoad" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-md shadow-indigo-600/20 transition-all border border-indigo-500 hover:border-indigo-600">
+                    <svg id="loadIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span class="hidden sm:inline">Sinkronisasi</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto dark-scroll p-4 md:p-6 space-y-6">
+            
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 transition-colors duration-300">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-3 gap-2">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            Kualitas Nomor (Quality Rating Sesi)
+                        </h3>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 transition-colors" id="healthDesc">Sistem belum berjalan. Reputasi pengiriman awal berada di tingkat maksimal (Aman).</p>
+                    </div>
+                    <div class="text-left sm:text-right flex items-center sm:block gap-3">
+                        <span class="text-xl sm:text-2xl font-black text-emerald-500 transition-colors" id="healthScoreText">100%</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 sm:ml-2 inline-block transition-colors" id="healthStatusBadge">SANGAT BAIK</span>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden transition-colors">
+                    <div id="healthProgressBar" class="bg-emerald-500 h-3 rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- METRIK GRID DENGAN RATA KIRI ABSOLUT -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 transition-colors duration-300 overflow-hidden">
+                    <div class="relative z-10 flex-1 flex flex-col items-start justify-center min-w-0 text-left">
+                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate w-full" title="Sisa Antrean">Sisa Antrean</p>
+                        <h3 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-slate-100 truncate w-full mt-0.5" id="queueCount">0</h3>
+                    </div>
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 relative flex-shrink-0">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden transition-colors duration-300">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-indigo-50 dark:bg-indigo-900/20 rounded-full"></div>
+                    <div class="relative z-10 flex-1 flex flex-col items-start justify-center min-w-0 text-left w-full">
+                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate w-full" title="Target Filtered">Target Filtered</p>
+                        <h3 class="text-2xl sm:text-3xl font-black text-indigo-900 dark:text-indigo-400 truncate w-full mt-0.5" id="statTotal">0</h3>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden transition-colors duration-300">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full"></div>
+                    <div class="relative z-10 flex-1 flex flex-col items-start justify-center min-w-0 text-left w-full">
+                        <p class="text-[10px] font-bold text-emerald-500 uppercase truncate w-full" title="Sukses Terkirim">Sukses Terkirim</p>
+                        <h3 class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 truncate w-full mt-0.5" id="statSent">0</h3>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden transition-colors duration-300">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full"></div>
+                    <div class="relative z-10 flex-1 flex flex-col items-start justify-center min-w-0 text-left w-full">
+                        <p class="text-[10px] font-bold text-red-500 uppercase truncate w-full" title="Gagal / Invalid">Gagal / Invalid</p>
+                        <h3 class="text-2xl sm:text-3xl font-black text-red-600 dark:text-red-400 truncate w-full mt-0.5" id="statFailed">0</h3>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-[500px] transition-colors duration-300">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-xl transition-colors duration-300">
+                    <div class="flex-1 max-w-sm">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-4 w-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" id="searchInput" onkeyup="applyFilter()" placeholder="Filter nama, status..." class="block w-full pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" disabled>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-center">
+                        <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Klik untuk sisipkan variabel:</p>
+                        <div id="variableChips" class="flex gap-1.5 overflow-x-auto scrollbar-hide"></div>
+                    </div>
+                </div>
+                
+                <div id="statusList" class="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50/30 dark:bg-slate-950/30 dark-scroll">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
+                        <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <p class="font-medium">Ruang kerja masih kosong.</p>
+                        <p class="text-xs mt-1">Sinkronisasi Sheet atau Import CSV untuk memulai.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="h-10"></div>
+        </div>
+
+        <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] z-20 flex-shrink-0 transition-colors duration-300">
+            <div class="max-w-4xl mx-auto">
+                <button onclick="handleStartAction()" id="btnStart" disabled class="w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold py-4 rounded-xl shadow-sm transition-all duration-300 cursor-not-allowed flex justify-center items-center gap-2 text-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="btnStartText">Menunggu Data...</span>
+                </button>
+
+                <div id="playbackControls" class="grid grid-cols-2 gap-4 hidden">
+                    <button onclick="togglePause()" id="btnPause" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-amber-500/30 transition flex justify-center items-center gap-2 text-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span id="btnPauseText">Jeda Sistem</span>
+                    </button>
+                    <button onclick="stopSending()" id="btnStop" class="bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 transition flex justify-center items-center gap-2 text-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z"></path></svg>
+                        Berhenti
+                    </button>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Modal Live Preview -->
+    <div id="previewModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-[#efeae2] dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] transform scale-95 transition-all duration-300 border dark:border-slate-700" id="previewModalContent">
+            <div class="bg-[#00a884] dark:bg-[#007b60] text-white p-3 flex items-center gap-3 transition-colors">
+                <div class="bg-white/20 p-2 rounded-full cursor-pointer hover:bg-white/30 transition" onclick="closePreview()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-sm leading-tight" id="previewName">Nama Kontak</h3>
+                    <p class="text-[10px] text-white/80" id="previewPhone">+62 8...</p>
+                </div>
+            </div>
+            
+            <div class="p-4 overflow-y-auto flex-1 bg-[url('https://i.ibb.co/3s1f9bT/wa-bg.png')] bg-cover bg-center relative">
+                <div class="absolute inset-0 bg-slate-950/80 dark:block hidden pointer-events-none"></div>
+                
+                <div class="text-center mb-4 relative z-10">
+                    <span class="bg-[#e1f3fb] dark:bg-slate-800 text-[#4a5568] dark:text-slate-300 text-[10px] px-3 py-1 rounded-lg shadow-sm border border-white/50 dark:border-slate-700 inline-block transition-colors">
+                        Pratinjau Live: Spintax & Variabel telah dirender
+                    </span>
+                    <div id="previewZeroWidthIndication" class="hidden mt-1 text-[9px] text-red-500 font-bold bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded shadow-sm border dark:border-red-800/50 inline-block">
+                        *Zero-Width Hash Breaker Aktif (Tidak terlihat oleh mata)
+                    </div>
+                </div>
+                
+                <div class="flex justify-end relative z-10">
+                    <div class="wa-bubble max-w-[85%] transition-colors">
+                        <p class="text-sm text-[#111b21] whitespace-pre-wrap leading-relaxed" id="previewText">Memuat pesan...</p>
+                        <!-- Preview Lampiran Dinamis -->
+                        <div id="previewAttachmentInfo" class="hidden mt-2 pt-2 border-t border-emerald-200/50 text-[10px] text-emerald-700 font-semibold break-all"></div>
+                        <!-- Waktu -->
+                        <div class="text-[10px] text-[#667781] text-right mt-1.5 font-medium">10:00 <svg class="inline w-3 h-3 text-[#53bdeb]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 8.21a1 1 0 00-1.42 0l-7.29 7.29-3.29-3.29a1 1 0 00-1.42 1.42l4 4a1 1 0 001.42 0l8-8a1 1 0 000-1.42z"/></svg><svg class="inline w-3 h-3 text-[#53bdeb] -ml-2" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 8.21a1 1 0 00-1.42 0l-7.29 7.29-3.29-3.29a1 1 0 00-1.42 1.42l4 4a1 1 0 001.42 0l8-8a1 1 0 000-1.42z"/></svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        // =========================================================================
+        // SECURITY MODULE: AES-256 CLIENT-SIDE ENCRYPTION (CRYPTO-JS)
+        // =========================================================================
+        const SECURE_SALT = "WA_ENT_PR0_S3CR3T_KEY_2026_X!"; 
+        
+        const SecureStore = {
+            set: function(key, value) {
+                try {
+                    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(value), SECURE_SALT).toString();
+                    localStorage.setItem(key, encrypted);
+                } catch(e) { console.error("Encryption Failed"); }
+            },
+            get: function(key) {
+                const encrypted = localStorage.getItem(key);
+                if (!encrypted) return null;
+                try {
+                    const bytes = CryptoJS.AES.decrypt(encrypted, SECURE_SALT);
+                    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+                } catch(e) { return null; }
+            },
+            remove: function(key) { localStorage.removeItem(key); }
+        };
+
+        // =========================================================================
+        // 👇 URL GOOGLE APPS SCRIPT (API GATEWAY PREP) 👇
+        // =========================================================================
+        const API_GATEWAY = {
+            ADMIN_AUTH: 'https://script.google.com/macros/s/AKfycby6AuDbQDqghOt-03MZbywbx5DMJEKXth9MgVEDcdFHz3L69u-Qt-5FQBAAXD-TsEo2/exec'
+        };
+        // =========================================================================
+
+        let rawData = [];         
+        let filteredData = [];    
+        let availableVariables = [];
+        let campaignProfiles = {};
+        
+        let isSending = false;
+        let isPaused = false;
+        let stopRequested = false;
+        let currentIndex = 0;
+        let countdownTimer = null;
+        let batchSendCounter = 0; 
+        
+        let statsTrack = { pending: 0, sent: 0, failed: 0, health: 100 };
+        let donutChart = null;
+        let consecutiveMetaErrors = 0; 
+
+        const LS_CAMPAIGN_KEY = 'wa_sec_campaigns_v9';
+        const LS_SESSION_KEY = 'wa_sec_recovery_v9';
+        const LS_AUTH_USER = 'wa_sec_auth_user_v9';
+
+        const alertAudio = new Audio('data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initThemeIcons();
+            checkAuth();
+            initCampaignProfiles();
+            initChart();
+            checkRecoverySession();
+            analyzeSpamScore(); 
+            updateHealthUI();
+            initSecurityWatchdog();
+
+            document.getElementById('userApiUrl').value = SecureStore.get('wa_user_api_url') || '';
+            document.getElementById('userApiUrl').addEventListener('change', (e) => { SecureStore.set('wa_user_api_url', e.target.value.trim()); });
+            
+            document.getElementById('metaToken').value = SecureStore.get('wa_meta_token') || '';
+            document.getElementById('metaPhoneId').value = SecureStore.get('wa_meta_phone') || '';
+            document.getElementById('metaTemplateName').value = SecureStore.get('wa_meta_template') || '';
+
+            document.getElementById('metaToken').addEventListener('change', syncMetaToCloud);
+            document.getElementById('metaPhoneId').addEventListener('change', syncMetaToCloud);
+            document.getElementById('metaTemplateName').addEventListener('change', syncMetaToCloud);
+            
+            updateBlacklistCount();
+        });
+
+        // ==========================================
+        // AUTO-SYNC META CREDENTIALS TO ADMIN BACKEND
+        // ==========================================
+        async function syncMetaToCloud() {
+            const userSession = SecureStore.get(LS_AUTH_USER);
+            if (!userSession || !userSession.email) return;
+
+            const mToken = document.getElementById('metaToken').value.trim();
+            const mPhone = document.getElementById('metaPhoneId').value.trim();
+            const mTmpl = document.getElementById('metaTemplateName').value.trim();
+
+            SecureStore.set('wa_meta_token', mToken);
+            SecureStore.set('wa_meta_phone', mPhone);
+            SecureStore.set('wa_meta_template', mTmpl);
+
+            try {
+                if (API_GATEWAY.ADMIN_AUTH) {
+                    fetch(API_GATEWAY.ADMIN_AUTH, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'save_meta', email: userSession.email, metaToken: mToken, metaPhoneId: mPhone, metaTemplate: mTmpl })
+                    });
+                }
+            } catch(e) { console.error('Gagal auto-sync Meta Creds ke Cloud', e); }
+        }
+
+        // ==========================================
+        // BLACKLIST (OPT-OUT) MANAGEMENT
+        // ==========================================
+        function openBlacklist() {
+            const modal = document.getElementById('blacklistModal');
+            const input = document.getElementById('blacklistInput');
+            const bl = SecureStore.get('wa_blacklist') || [];
+            input.value = bl.join('\n');
+            updateBlacklistCount();
+            modal.classList.remove('hidden');
+        }
+
+        function closeBlacklist() {
+            document.getElementById('blacklistModal').classList.add('hidden');
+        }
+
+        function saveBlacklist() {
+            const raw = document.getElementById('blacklistInput').value;
+            const numbers = raw.split(/[\n,]+/).map(n => n.trim()).filter(n => n !== '');
+            const cleanNumbers = [];
+            
+            numbers.forEach(n => {
+                const s = sanitizeNumber(n);
+                if (s.valid) cleanNumbers.push(s.clean);
+            });
+            
+            // Remove duplicates
+            const uniqueBl = [...new Set(cleanNumbers)];
+            SecureStore.set('wa_blacklist', uniqueBl);
+            updateBlacklistCount();
+            
+            Swal.fire({ icon: 'success', title: 'Tersimpan', text: `${uniqueBl.length} nomor berhasil dimasukkan ke daftar Blacklist.`, timer: 1500, showConfirmButton: false });
+            closeBlacklist();
+        }
+
+        function updateBlacklistCount() {
+            const bl = SecureStore.get('wa_blacklist') || [];
+            const el = document.getElementById('blacklistCount');
+            if(el) el.innerText = `Total Terdaftar: ${bl.length} Nomor`;
+        }
+
+        // ==========================================
+        // TEST CONNECTION LOGIC (PING)
+        // ==========================================
+        async function testClientApi() {
+            const url = document.getElementById('userApiUrl').value.trim();
+            if(!url) return Swal.fire('Kolom Kosong', 'Harap isi URL API Google Sheets Anda.', 'warning');
+            
+            Swal.fire({ title: 'Menguji Koneksi...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
+            try {
+                const res = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'getContacts' }) });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    Swal.fire('Koneksi Berhasil!', `API merespons dengan baik. Ditemukan ${data.data.length} data kontak.`, 'success');
+                } else {
+                    Swal.fire('Koneksi Gagal', data.message || 'Respon API tidak valid.', 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error API', 'Gagal menghubungi server URL Klien. Pastikan URL sudah benar dan di-deploy sebagai Anyone.', 'error');
+            }
+        }
+
+        async function testMetaApi() {
+            const token = document.getElementById('metaToken').value.trim();
+            const phoneId = document.getElementById('metaPhoneId').value.trim();
+            if(!token || !phoneId) return Swal.fire('Kredensial Kosong', 'Harap isi Token Meta dan Phone ID Anda.', 'warning');
+            
+            Swal.fire({ title: 'Validasi Token Meta...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
+            try {
+                const res = await fetch(`https://graph.facebook.com/v19.0/${phoneId}`, { 
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const data = await res.json();
+                
+                if(data.id) {
+                    Swal.fire('Kredensial Valid!', `Berhasil terhubung ke Meta Cloud. (Phone ID diverifikasi)`, 'success');
+                } else {
+                    Swal.fire('Akses Ditolak', data.error?.message || 'Token atau Phone ID tidak valid/kadaluarsa.', 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error Koneksi', 'Gagal menghubungi server Facebook/Meta.', 'error');
+            }
+        }
+
+        // ==========================================
+        // SECURITY: SESSION WATCHDOG (AUTO-LOGOUT)
+        // ==========================================
+        function initSecurityWatchdog() {
+            let idleTime = 0;
+            const resetTimer = () => { idleTime = 0; };
+            
+            document.body.addEventListener('mousemove', resetTimer);
+            document.body.addEventListener('keypress', resetTimer);
+            document.body.addEventListener('touchstart', resetTimer);
+
+            setInterval(() => {
+                if (SecureStore.get(LS_AUTH_USER)) {
+                    idleTime++;
+                    if (idleTime >= 15) {
+                        SecureStore.remove(LS_AUTH_USER);
+                        Swal.fire({
+                            icon: 'warning', title: 'Sesi Berakhir', text: 'Anda telah dikeluarkan karena tidak ada aktivitas selama 15 menit.', confirmButtonColor: '#059669'
+                        }).then(() => { window.location.reload(); });
+                    }
+                }
+            }, 60000); 
+        }
+
+        function toggleSendMode() {
+            const mode = document.getElementById('sendMode').value;
+            const waWebConfig = document.getElementById('waWebConfig');
+            const metaApiConfig = document.getElementById('metaApiConfig');
+            const antiBanModule = document.getElementById('antiBanModule');
+
+            if (mode === 'meta_api') {
+                waWebConfig.classList.add('hidden');
+                metaApiConfig.classList.remove('hidden');
+                antiBanModule.classList.add('opacity-50', 'pointer-events-none'); 
+            } else {
+                waWebConfig.classList.remove('hidden');
+                metaApiConfig.classList.add('hidden');
+                antiBanModule.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        let authMode = 'login';
+
+        function checkAuth() {
+            const userStr = SecureStore.get(LS_AUTH_USER);
+            if (userStr) {
+                try {
+                    document.getElementById('authModal').classList.add('hidden');
+                    document.getElementById('userProfileBadge').classList.remove('hidden');
+                    document.getElementById('userProfileBadge').classList.add('flex');
+                    document.getElementById('userNameDisplay').innerText = userStr.name || userStr.email.split('@')[0];
+                    document.getElementById('userInitial').innerText = (userStr.name || userStr.email).charAt(0).toUpperCase();
+                } catch(e) { showAuthModal(); }
+            } else { showAuthModal(); }
+        }
+
+        function showAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('hidden');
+            document.getElementById('userProfileBadge').classList.add('hidden');
+            document.getElementById('userProfileBadge').classList.remove('flex');
+        }
+
+        function switchAuthTab(mode) {
+            authMode = mode;
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+            const nameField = document.getElementById('nameField');
+            const submitBtn = document.getElementById('authSubmitText');
+
+            if (mode === 'login') {
+                tabLogin.className = "flex-1 py-2 text-sm font-bold bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 rounded-md shadow-sm transition-all";
+                tabRegister.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md transition-all";
+                nameField.classList.add('hidden');
+                submitBtn.innerText = "Masuk ke Dashboard";
+            } else {
+                tabRegister.className = "flex-1 py-2 text-sm font-bold bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 rounded-md shadow-sm transition-all";
+                tabLogin.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md transition-all";
+                nameField.classList.remove('hidden');
+                submitBtn.innerText = "Daftar Akun Baru";
+            }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const name = document.getElementById('authName').value.trim();
+
+            const btnText = document.getElementById('authSubmitText');
+            const btnLoading = document.getElementById('authLoading');
+            const btnSubmit = document.getElementById('authSubmitBtn');
+            
+            btnText.innerText = "Memproses...";
+            btnLoading.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnSubmit.classList.add('opacity-70', 'cursor-not-allowed');
+
+            const payloadData = { action: authMode, email: email, password: password };
+            if (authMode === 'register') payloadData.name = name;
+
+            try {
+                if (!API_GATEWAY.ADMIN_AUTH || API_GATEWAY.ADMIN_AUTH === "") {
+                    Swal.fire({ icon: 'error', title: 'Server URL Kosong', text: 'Silakan hubungi administrator.', confirmButtonColor: '#059669' });
+                    return;
+                }
+
+                const response = await fetch(API_GATEWAY.ADMIN_AUTH, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payloadData) 
+                });
+
+                const responseText = await response.text();
+                let result;
+                try { result = JSON.parse(responseText); } catch(err) { throw new Error("Server JSON Error."); }
+
+                if (result.status === 'success') {
+                    if (authMode === 'register') {
+                        Swal.fire({
+                            icon: 'success', title: 'Pendaftaran Berhasil!', text: result.message || "Akun Anda telah tersimpan dan sedang ditinjau oleh Admin.", confirmButtonColor: '#059669'
+                        }).then(() => {
+                            switchAuthTab('login'); document.getElementById('authPassword').value = '';
+                        });
+                    } else {
+                        const accStatus = result.accountStatus ? result.accountStatus.toLowerCase() : 'allowed';
+                        if (accStatus !== 'allowed' && accStatus !== 'aktif' && accStatus !== 'active' && accStatus !== 'approved') {
+                            document.getElementById('authPassword').value = '';
+                            Swal.fire({ icon: 'warning', title: 'Akses Tertunda', text: "Akun Anda masih berstatus '" + (result.accountStatus || "Pending") + "'. Silakan tunggu persetujuan Administrator.", confirmButtonColor: '#059669' });
+                            return;
+                        }
+
+                        const userSession = { email: email, name: result.name || name || email.split('@')[0], token: result.token || Date.now().toString() };
+                        SecureStore.set(LS_AUTH_USER, userSession); 
+                        
+                        if(result.metaToken !== undefined) {
+                            SecureStore.set('wa_meta_token', result.metaToken);
+                            document.getElementById('metaToken').value = result.metaToken;
+                        }
+                        if(result.metaPhoneId !== undefined) {
+                            SecureStore.set('wa_meta_phone', result.metaPhoneId);
+                            document.getElementById('metaPhoneId').value = result.metaPhoneId;
+                        }
+                        if(result.metaTemplate !== undefined) {
+                            SecureStore.set('wa_meta_template', result.metaTemplate);
+                            document.getElementById('metaTemplateName').value = result.metaTemplate;
+                        }
+
+                        document.getElementById('authPassword').value = ''; 
+                        Swal.fire({ icon: 'success', title: 'Berhasil Masuk', text: 'Selamat datang kembali, ' + userSession.name + '!', timer: 1500, showConfirmButton: false }).then(() => { checkAuth(); });
+                    }
+                } else {
+                    document.getElementById('authPassword').value = ''; 
+                    Swal.fire({ icon: 'error', title: 'Autentikasi Gagal', text: result.message || "Terjadi kesalahan sistem.", confirmButtonColor: '#059669' });
+                }
+            } catch (error) {
+                let advice = "Pastikan URL Google Apps Script Admin sudah benar.";
+                Swal.fire({ icon: 'error', title: 'Gagal Menghubungi Server', text: error.message + "\n\n" + advice, confirmButtonColor: '#059669' });
+            } finally {
+                setTimeout(() => {
+                    btnText.innerText = authMode === 'login' ? "Masuk ke Dashboard" : "Daftar Akun Baru";
+                    btnLoading.classList.add('hidden'); btnSubmit.disabled = false; btnSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
+                }, 800);
+            }
+        }
+
+        function handleLogout() {
+            Swal.fire({
+                title: 'Keluar Aplikasi?', text: "Sesi Anda saat ini akan ditutup secara aman.", icon: 'question',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Keluar', cancelButtonText: 'Batal', reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    SecureStore.remove(LS_AUTH_USER);
+                    document.getElementById('authEmail').value = ''; document.getElementById('authPassword').value = ''; document.getElementById('authName').value = '';
+                    showAuthModal(); switchAuthTab('login');
+                }
+            });
+        }
+
+        function updateHealthScore(change) {
+            statsTrack.health += change;
+            statsTrack.health = Math.max(0, Math.min(100, statsTrack.health));
+            updateHealthUI();
+        }
+
+        function updateHealthUI() {
+            const bar = document.getElementById('healthProgressBar');
+            const scoreText = document.getElementById('healthScoreText');
+            const badge = document.getElementById('healthStatusBadge');
+            const desc = document.getElementById('healthDesc');
+
+            const score = Math.floor(statsTrack.health);
+            bar.style.width = `${score}%`;
+            scoreText.innerText = `${score}%`;
+
+            if (score >= 70) {
+                bar.className = "bg-emerald-500 h-3 rounded-full transition-colors";
+                scoreText.className = "text-xl sm:text-2xl font-black text-emerald-500 transition-colors";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 sm:ml-2 inline-block transition-colors";
+                badge.innerText = "SANGAT BAIK";
+                desc.innerText = "Reputasi pengiriman terpantau sangat baik. Intensitas pengiriman aman.";
+            } else if (score >= 35) {
+                bar.className = "bg-amber-500 h-3 rounded-full transition-colors";
+                scoreText.className = "text-xl sm:text-2xl font-black text-amber-500 transition-colors";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 sm:ml-2 inline-block transition-colors";
+                badge.innerText = "MENURUN (WASPADA)";
+                desc.innerText = "Perhatian: Terlalu banyak pesan berturut-turut atau gagal. Pertimbangkan untuk memperlama durasi Delay.";
+            } else {
+                bar.className = "bg-red-500 h-3 rounded-full transition-colors";
+                scoreText.className = "text-xl sm:text-2xl font-black text-red-500 transition-colors";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 sm:ml-2 inline-block transition-colors";
+                badge.innerText = "RISIKO BANNED!";
+                desc.innerText = "Sangat Bahaya! Reputasi buruk akibat intensitas spam. Jeda kampanye sekarang juga.";
+                
+                if (score <= 25 && isSending && !isPaused) {
+                     Swal.fire('SYSTEM AUTO-PAUSE 🛑', 'Quality Rating nomor Anda jatuh ke level Kritis (< 25%).\n\nSistem otomatis menghentikan pengiriman untuk mencegah nomor Anda terblokir permanen oleh Meta. Istirahatkan nomor Anda setidaknya 1-2 jam sebelum melanjutkan.', 'error');
+                     togglePause();
+                }
+            }
+        }
+
+        function analyzeSpamScore() {
+            const text = document.getElementById('message').value || "";
+            let score = 0;
+            let advice = [];
+
+            if (text.length === 0) {
+                updateSpamUI(0, "Tulis pesan untuk melihat analisis heuristik otomatis.");
+                return;
+            }
+
+            const upperCaseMatch = text.match(/[A-Z]{4,}/g);
+            if (upperCaseMatch && upperCaseMatch.length > 2) { score += 25; advice.push("Terlalu banyak huruf kapital."); }
+
+            if (text.match(/!{2,}|\?{2,}/g)) { score += 15; advice.push("Kurangi tanda baca (! atau ?) berurutan."); }
+
+            const spamWords = /(gratis|diskon|promo|menang|hadiah|klaim|murah|buruan|terbatas|uang tunai)/gi;
+            const spamWordsMatch = text.match(spamWords);
+            if (spamWordsMatch) {
+                score += (spamWordsMatch.length * 10);
+                advice.push(`Terdapat kata berisiko: ${[...new Set(spamWordsMatch)].join(', ')}.`);
+            }
+
+            if (!text.includes('{nama}') && !text.includes('{name}')) {
+                score += 30; advice.push("Risiko spam! Tambahkan variabel {nama} agar pesan tidak identik.");
+            }
+
+            if (text.match(/\{([^{}]+)\|([^{}]+)\}/g)) { score -= 15; }
+
+            score = Math.max(0, Math.min(100, score));
+
+            let finalAdvice = advice.length > 0 ? advice.join(' ') : "Teks terlihat natural dan aman.";
+            if (score <= 0 && advice.length === 0) finalAdvice = "Sangat bagus! Gunakan Spintax & {nama} untuk keamanan ekstra.";
+            
+            updateSpamUI(score, finalAdvice);
+        }
+
+        function updateSpamUI(score, advice) {
+            const progressBar = document.getElementById('spamProgress');
+            const scoreText = document.getElementById('spamScoreText');
+            const adviceText = document.getElementById('spamAdvice');
+
+            progressBar.style.width = `${score}%`;
+            scoreText.innerText = `${score}%`;
+            adviceText.innerText = advice;
+
+            if (score <= 30) {
+                progressBar.className = "h-1.5 rounded-full bg-emerald-500 transition-colors";
+                scoreText.className = "text-xs font-bold text-emerald-500 transition-colors";
+                scoreText.innerText += " (Aman)";
+            } else if (score <= 60) {
+                progressBar.className = "h-1.5 rounded-full bg-amber-500 transition-colors";
+                scoreText.className = "text-xs font-bold text-amber-500 transition-colors";
+                scoreText.innerText += " (Hati-hati)";
+            } else {
+                progressBar.className = "h-1.5 rounded-full bg-red-500 transition-colors";
+                scoreText.className = "text-xs font-bold text-red-500 transition-colors";
+                scoreText.innerText += " (Bahaya Spam!)";
+            }
+        }
+
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            const statusList = document.getElementById('statusList');
+            statusList.innerHTML = '<div class="text-center mt-14"><p class="text-teal-600 dark:text-teal-400 text-sm animate-pulse font-semibold">Memproses file CSV Lokal...</p></div>';
+
+            reader.onload = function(e) { processCSVData(e.target.result); event.target.value = ''; };
+            reader.onerror = function() { Swal.fire('Error', 'Gagal membaca file CSV.', 'error'); statusList.innerHTML = '<p class="text-slate-400">Silakan coba lagi.</p>'; };
+            reader.readAsText(file);
+        }
+
+        function processCSVData(csvText) {
+            const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
+            if (lines.length < 2) return Swal.fire('Data Kosong', 'File CSV kosong atau tidak memiliki header.', 'warning');
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+            const parsedData = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const currentLine = lines[i].split(',');
+                const obj = { _rowIdx: i + 1 }; 
+                for (let j = 0; j < headers.length; j++) {
+                    if (headers[j]) obj[headers[j]] = currentLine[j] ? currentLine[j].trim().replace(/^"|"$/g, '') : "";
+                }
+                parsedData.push(obj);
+            }
+            handleDataSuccess(parsedData, "CSV");
+        }
+
+        function initThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            updateThemeIconsUI(isDark);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('wa_theme', isDark ? 'dark' : 'light');
+            updateThemeIconsUI(isDark);
+            if(donutChart) { donutChart.data.datasets[0].backgroundColor[0] = isDark ? '#334155' : '#e2e8f0'; donutChart.update(); }
+        }
+
+        function updateThemeIconsUI(isDark) {
+            document.getElementById('themeIconDark').classList.toggle('hidden', isDark);
+            document.getElementById('themeIconLight').classList.toggle('hidden', !isDark);
+        }
+
+        function isOutsideWorkingHours() {
+            const start = document.getElementById('workStart').value;
+            const end = document.getElementById('workEnd').value;
+            if(!start || !end) return false;
+            const now = new Date();
+            const currentStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            if (start <= end) return currentStr < start || currentStr >= end;
+            else return currentStr >= end && currentStr < start;
+        }
+
+        function checkRecoverySession() {
+            const savedSession = SecureStore.get(LS_SESSION_KEY);
+            if (savedSession) {
+                document.getElementById('btnRecover').classList.remove('hidden');
+                document.getElementById('btnRecover').classList.add('flex', 'animate-pulse');
+            }
+        }
+
+        function recoverSession() {
+            try {
+                const session = SecureStore.get(LS_SESSION_KEY);
+                if (!session) return;
+                
+                Swal.fire({
+                    title: 'Pulihkan Sesi?', text: `Sesi crash ditemukan pada antrean ke-${session.idx}. Apakah Anda ingin memulihkannya?`, icon: 'info',
+                    showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Pulihkan'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        rawData = session.data; filteredData = session.data; currentIndex = session.idx; statsTrack = session.stats;
+                        
+                        availableVariables = Object.keys(filteredData[0]).filter(k => k !== '_rowIdx' && k !== '_status_ui' && k !== '_rawNo');
+                        renderVariableChips(); renderDataPreview(); updateStatsUI(); updateHealthUI();
+
+                        setTimeout(() => {
+                            const lastCard = document.getElementById(`row-item-${currentIndex}`);
+                            if(lastCard) lastCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }, 500);
+
+                        document.getElementById('btnRecover').classList.add('hidden'); document.getElementById('btnRecover').classList.remove('flex');
+                        document.getElementById('btnStart').disabled = false;
+                        document.getElementById('btnStart').className = "w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-amber-500/30 transition-all duration-300 flex justify-center items-center gap-2 text-lg";
+                        document.getElementById('btnStartText').innerText = "Lanjutkan Sesi Crash";
+                        document.getElementById('searchInput').disabled = false; document.getElementById('btnExport').disabled = false;
+                        document.getElementById('btnExport').classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        SecureStore.remove(LS_SESSION_KEY);
+                        document.getElementById('btnRecover').classList.add('hidden'); document.getElementById('btnRecover').classList.remove('flex');
+                    }
+                });
+            } catch(e) { SecureStore.remove(LS_SESSION_KEY); }
+        }
+
+        function saveCurrentSession() {
+            if (filteredData.length > 0 && isSending) { SecureStore.set(LS_SESSION_KEY, { data: filteredData, idx: currentIndex, stats: statsTrack }); }
+        }
+
+        function clearCurrentSession() { SecureStore.remove(LS_SESSION_KEY); }
+
+        function initCampaignProfiles() {
+            const saved = SecureStore.get(LS_CAMPAIGN_KEY);
+            if (saved) { campaignProfiles = saved; updateCampaignDropdown(); }
+        }
+        function updateCampaignDropdown() {
+            const select = document.getElementById('campaignSelect');
+            while (select.options.length > 1) select.remove(1);
+            for (const key in campaignProfiles) {
+                const opt = document.createElement('option'); opt.value = key; opt.text = key; select.appendChild(opt);
+            }
+        }
+        function loadCampaignProfile() {
+            const key = document.getElementById('campaignSelect').value;
+            if (!key || !campaignProfiles[key]) return;
+            const prof = campaignProfiles[key];
+            
+            document.getElementById('message').value = prof.msg || '';
+            document.getElementById('mediaUrl').value = prof.url || '';
+            document.getElementById('fallbackName').value = prof.fallback || 'Bapak/Ibu';
+            document.getElementById('minDelay').value = prof.minDelay || 15;
+            document.getElementById('maxDelay').value = prof.maxDelay || 45;
+            document.getElementById('batchSize').value = prof.batchSize || 50;
+            document.getElementById('restTime').value = prof.restTime || 10;
+            document.getElementById('useZeroWidth').checked = prof.useZeroWidth !== false; 
+            document.getElementById('useTypingSpeed').checked = prof.useTypingSpeed !== false;
+            document.getElementById('useWarmup').checked = prof.useWarmup || false;
+            document.getElementById('workStart').value = prof.workStart || '07:00';
+            document.getElementById('workEnd').value = prof.workEnd || '22:00';
+            document.getElementById('interventionLimit').value = prof.interventionLimit || 40;
+            
+            // Load Meta specific config
+            if(prof.metaButtonParam !== undefined) {
+                document.getElementById('metaButtonParam').value = prof.metaButtonParam;
+            }
+            
+            analyzeSpamScore(); 
+        }
+        function saveCampaignProfile() {
+            const msg = document.getElementById('message').value.trim();
+            if (!msg) return Swal.fire('Teks Kosong', 'Silakan isi pesan utama terlebih dahulu.', 'warning');
+            
+            const profileName = prompt("Nama Profil Kampanye Workspace:", "Workspace Baru");
+            if (profileName && profileName.trim()) {
+                campaignProfiles[profileName.trim()] = {
+                    msg: msg, url: document.getElementById('mediaUrl').value.trim(),
+                    fallback: document.getElementById('fallbackName').value.trim(),
+                    minDelay: document.getElementById('minDelay').value, maxDelay: document.getElementById('maxDelay').value,
+                    batchSize: document.getElementById('batchSize').value, restTime: document.getElementById('restTime').value,
+                    useZeroWidth: document.getElementById('useZeroWidth').checked, useTypingSpeed: document.getElementById('useTypingSpeed').checked,
+                    useWarmup: document.getElementById('useWarmup').checked, workStart: document.getElementById('workStart').value,
+                    workEnd: document.getElementById('workEnd').value, interventionLimit: document.getElementById('interventionLimit').value,
+                    metaButtonParam: document.getElementById('metaButtonParam').value.trim()
+                };
+                SecureStore.set(LS_CAMPAIGN_KEY, campaignProfiles);
+                updateCampaignDropdown(); document.getElementById('campaignSelect').value = profileName.trim();
+                Swal.fire('Tersimpan', `Profil "${profileName.trim()}" berhasil dienkripsi dan disimpan.`, 'success');
+            }
+        }
+        function deleteCampaignProfile() {
+            const key = document.getElementById('campaignSelect').value;
+            if (!key) return;
+            Swal.fire({
+                title: 'Hapus Profil?', text: `Hapus permanen profil "${key}"?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    delete campaignProfiles[key]; SecureStore.set(LS_CAMPAIGN_KEY, campaignProfiles);
+                    updateCampaignDropdown(); document.getElementById('campaignSelect').value = '';
+                }
+            });
+        }
+
+        // IMPROVED: Number Validator (Mendeteksi format yang jelas salah)
+        function sanitizeNumber(rawString) {
+            if (!rawString) return { valid: false, clean: "" };
+            let cleanStr = String(rawString).replace(/\D/g, '');
+            if (cleanStr.startsWith('0')) cleanStr = '62' + cleanStr.substring(1);
+            
+            // Heuristic checks
+            if (cleanStr.length < 9 || cleanStr.length > 15) return { valid: false, clean: cleanStr };
+            if (/^(\d)\1{6,}$/.test(cleanStr.substring(2))) return { valid: false, clean: cleanStr }; // Deteksi digit berulang (contoh: 6288888888)
+            if (cleanStr === '62123456789' || cleanStr === '62000000000') return { valid: false, clean: cleanStr }; // Nomor dummy umum
+            
+            return { valid: true, clean: cleanStr };
+        }
+
+        async function fetchDataFromSheet() {
+            const userApi = document.getElementById('userApiUrl').value.trim();
+
+            if(!userApi || userApi === "") {
+                Swal.fire({
+                    title: 'API Kontak Kosong', text: 'URL API Kontak (Google Sheets Anda) belum diisi di Sidebar kiri.', icon: 'warning', confirmButtonColor: '#059669'
+                });
+                return;
+            }
+
+            const btnLoad = document.getElementById('btnLoad');
+            const icon = document.getElementById('loadIcon');
+            btnLoad.disabled = true; icon.classList.add('animate-spin');
+            document.getElementById('statusList').innerHTML = '<div class="text-center mt-14"><p class="text-indigo-600 dark:text-indigo-400 text-sm animate-pulse font-semibold">Terkoneksi ke Database Klien... Mengunduh & Validasi.</p></div>';
+
+            try {
+                const response = await fetch(userApi, {
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'getContacts' })
+                });
+
+                const responseText = await response.text();
+                const result = JSON.parse(responseText);
+
+                if (result.status === 'success') {
+                    handleDataSuccess(result.data, "API Server");
+                } else {
+                    throw new Error(result.message || "Gagal memuat data dari server.");
+                }
+            } catch (error) {
+                console.error("Sync Error:", error);
+                let errorMsg = error.message;
+                let suggestion = "Gagal terhubung ke Database Google Sheets pengguna.";
+                if (errorMsg.includes('DataKontak')) { suggestion = "Solusi: Buka file Google Sheets API Kontak Anda, buat tab (sheet) dengan nama 'DataKontak' (tanpa spasi), dan pastikan ada data kontak di dalamnya."; }
+
+                Swal.fire('Sinkronisasi Gagal', errorMsg + "\n\n" + suggestion, 'error');
+                btnLoad.disabled = false; icon.classList.remove('animate-spin');
+                document.getElementById('statusList').innerHTML = `
+                    <div class="text-center mt-10 px-4">
+                        <svg class="w-12 h-12 text-red-400 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <p class="text-red-500 font-bold text-sm mb-1">Gagal Sinkronisasi</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs mb-3">${errorMsg}</p>
+                        <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-semibold p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded border border-indigo-100 dark:border-indigo-800">${suggestion}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function handleDataSuccess(data, source = "Sistem") {
+            document.getElementById('loadIcon').classList.remove('animate-spin');
+            document.getElementById('btnLoad').disabled = false;
+            
+            const uniqueData = [];
+            const seenNumbers = new Set();
+
+            data.forEach(item => {
+                let noKey = Object.keys(item).find(k => k.toLowerCase() === 'no' || k.toLowerCase().includes('nomor') || k.toLowerCase() === 'hp' || k.toLowerCase() === 'phone' || k.toLowerCase() === 'telepon');
+                let rawNum = item[noKey] || "";
+                const sanitizeResult = sanitizeNumber(rawNum);
+                let processedItem = {...item, _rawNo: rawNum, _source: source};
+
+                if (!sanitizeResult.valid) {
+                    processedItem.no = sanitizeResult.clean || "Kosong"; processedItem._status_ui = 'Format Invalid';
+                    uniqueData.push(processedItem);
+                } else {
+                    processedItem.no = sanitizeResult.clean;
+                    if (!seenNumbers.has(processedItem.no)) {
+                        seenNumbers.add(processedItem.no); processedItem._status_ui = 'Siap';
+                        uniqueData.push(processedItem);
+                    }
+                }
+            });
+
+            rawData = uniqueData;
+            if(rawData.length === 0) {
+                document.getElementById('statusList').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-sm text-center mt-10">Data kosong/tidak valid.</p>';
+                return;
+            }
+
+            availableVariables = Object.keys(rawData[0]).filter(k => k !== '_rowIdx' && k !== '_status_ui' && k !== '_rawNo' && k !== 'no' && k !== '_source');
+            availableVariables.unshift('no');
+            renderVariableChips();
+            
+            document.getElementById('searchInput').disabled = false; document.getElementById('btnExport').disabled = false;
+            document.getElementById('btnExport').classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            statsTrack.health = 100; updateHealthUI(); applyFilter(); clearCurrentSession(); 
+            document.getElementById('btnRecover').classList.add('hidden'); document.getElementById('btnRecover').classList.remove('flex');
+            
+            Swal.fire({ icon: 'success', title: 'Data Berhasil Dimuat', text: `${filteredData.length} kontak valid siap dieksekusi.`, timer: 2000, showConfirmButton: false });
+        }
+
+        function renderVariableChips() {
+            const chips = document.getElementById('variableChips'); chips.innerHTML = '';
+            availableVariables.forEach(v => {
+                const span = document.createElement('span');
+                span.className = "text-[10px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded-md cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700 shadow-sm transition font-semibold whitespace-nowrap";
+                span.innerText = `{${v}}`; span.onclick = () => { document.getElementById('message').value += ` {${v}}`; analyzeSpamScore(); };
+                chips.appendChild(span);
+            });
+        }
+
+        function applyFilter() {
+            if (isSending) return; 
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = rawData.filter(item => Object.values(item).join(' ').toLowerCase().includes(keyword));
+
+            const tempHealth = statsTrack.health;
+            statsTrack = { pending: filteredData.length, sent: 0, failed: 0, health: tempHealth };
+            
+            filteredData.forEach(item => { if (item._status_ui === 'Format Invalid') { statsTrack.failed++; statsTrack.pending--; } });
+
+            currentIndex = 0; updateStatsUI(); renderDataPreview();
+            
+            const btnStart = document.getElementById('btnStart');
+            if (filteredData.length > 0) {
+                btnStart.disabled = false;
+                btnStart.className = "w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-500/30 transition-all duration-300 flex justify-center items-center gap-2 text-lg";
+                document.getElementById('btnStartText').innerText = "Mulai Pengiriman Massal";
+            } else {
+                btnStart.disabled = true;
+                btnStart.className = "w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold py-4 rounded-xl shadow-sm transition-all duration-300 cursor-not-allowed flex justify-center items-center gap-2 text-lg";
+                document.getElementById('btnStartText').innerText = "Data Kosong";
+            }
+        }
+
+        function renderDataPreview() {
+            const statusList = document.getElementById('statusList'); statusList.innerHTML = '';
+            filteredData.forEach((user, i) => {
+                const log = document.createElement('div'); log.id = `row-item-${i}`;
+                let displayName = user.nama || user.name || user.pelanggan || "Tanpa Nama";
+                if (!displayName.trim() && user.no) displayName = "No Name"; 
+                
+                let pillClass = "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700";
+                
+                if(user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal') {
+                    pillClass = "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800";
+                } else if(user._status_ui === 'Terkirim') {
+                    pillClass = "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
+                } else if(user._status_ui === 'Diabaikan (Blacklist)') {
+                    pillClass = "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
+                }
+                
+                let sourceBadge = user._source === 'CSV' ? `<span class="bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-teal-200 dark:border-teal-800">CSV</span>` : `<span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-indigo-200 dark:border-indigo-800">API</span>`;
+
+                log.className = "flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition cursor-pointer group";
+                log.onclick = () => showLivePreview(i);
+
+                log.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">${displayName} ${sourceBadge}</span>
+                        <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono tracking-wider">+${user.no}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 text-slate-200 dark:text-slate-600 group-hover:text-indigo-300 dark:group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <span class="status-pill border ${pillClass}" id="stat-${i}">${user._status_ui}</span>
+                    </div>
+                `;
+                statusList.appendChild(log);
+            });
+        }
+
+        function showLivePreview(index) {
+            const user = filteredData[index];
+            const rawTemplate = document.getElementById('message').value;
+            const mediaUrlRaw = document.getElementById('mediaUrl').value.trim();
+            const btnParamRaw = document.getElementById('metaButtonParam').value.trim();
+            const sendMode = document.getElementById('sendMode').value;
+            
+            const attachmentUI = document.getElementById('previewAttachmentInfo');
+            
+            if(sendMode === 'meta_api') {
+                const tmplName = document.getElementById('metaTemplateName').value;
+                if(!tmplName) return Swal.fire('Informasi', 'Isi Nama Template Meta Anda terlebih dahulu.', 'info');
+                
+                const matches = rawTemplate.match(/\{([^{}]+)\}/g) || [];
+                let previewMetaVar = '';
+                if(matches.length > 0) {
+                    previewMetaVar = `<br><br><span class="text-[10px] text-slate-500">Mendeteksi ${matches.length} variabel dinamis (Teks Utama):</span>`;
+                    matches.forEach((m, idx) => {
+                        const varName = m.replace(/[{}]/g, '');
+                        let val = user[varName] || user[varName.toLowerCase()] || "Bapak/Ibu";
+                        previewMetaVar += `<br><code class="text-[9px] bg-slate-100 p-0.5 rounded">Parameter {{${idx+1}}} = ${val}</code>`;
+                    });
+                }
+                
+                if (btnParamRaw) {
+                    let btnVal = processMessage(btnParamRaw, user, false);
+                    previewMetaVar += `<br><br><span class="text-[10px] text-slate-500">Mendeteksi Parameter Tombol URL:</span><br><code class="text-[9px] bg-slate-100 p-0.5 rounded">Param = ${btnVal}</code>`;
+                }
+
+                document.getElementById('previewText').innerHTML = `<span class="italic text-slate-600 font-semibold">[Template Cloud API: ${tmplName}]</span>${previewMetaVar}`;
+            } else {
+                if(!rawTemplate.trim()) return Swal.fire('Informasi', 'Isi teks pesan Utama terlebih dahulu untuk melihat Pratinjau.', 'info');
+                document.getElementById('previewText').innerText = processMessage(rawTemplate, user, false);
+            }
+
+            if (mediaUrlRaw) {
+                let dynamicUrl = processMessage(mediaUrlRaw, user, false);
+                attachmentUI.innerHTML = `📎 <strong>Lampiran:</strong><br><a href="#" class="text-indigo-500 underline">${dynamicUrl}</a>`;
+                attachmentUI.classList.remove('hidden');
+            } else {
+                attachmentUI.classList.add('hidden');
+            }
+
+            document.getElementById('previewName').innerText = user.nama || user.name || "Pelanggan";
+            document.getElementById('previewPhone').innerText = `+${user.no || 'Invalid'}`;
+            
+            const useZero = document.getElementById('useZeroWidth').checked;
+            const zeroIndication = document.getElementById('previewZeroWidthIndication');
+            if(useZero && sendMode === 'wa_web') zeroIndication.classList.remove('hidden'); else zeroIndication.classList.add('hidden');
+
+            const modal = document.getElementById('previewModal');
+            const content = document.getElementById('previewModalContent');
+            modal.classList.remove('hidden'); void modal.offsetWidth;
+            modal.classList.remove('opacity-0'); modal.classList.add('opacity-100');
+            content.classList.remove('scale-95'); content.classList.add('scale-100');
+        }
+
+        function closePreview() {
+            const modal = document.getElementById('previewModal'); const content = document.getElementById('previewModalContent');
+            modal.classList.remove('opacity-100'); modal.classList.add('opacity-0');
+            content.classList.remove('scale-100'); content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+        document.getElementById('previewModal').addEventListener('click', function(e) { if(e.target === this) closePreview(); });
+
+        function initChart() {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Sisa Antrean', 'Sukses Terkirim', 'Gagal/Invalid'], datasets: [{ data: [0, 0, 0], backgroundColor: [isDark ? '#334155' : '#e2e8f0', '#059669', '#dc2626'], borderWidth: 0, cutout: '75%', hoverOffset: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true } }, animation: { duration: 500 } }
+            });
+        }
+
+        function updateBadge(text, indicatorColor) {
+            document.getElementById('statusBadge').innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${indicatorColor} animate-pulse"></span> ${text}`;
+        }
+
+        function updateStatsUI() {
+            document.getElementById('statTotal').innerText = filteredData.length;
+            document.getElementById('statSent').innerText = statsTrack.sent;
+            document.getElementById('statFailed').innerText = statsTrack.failed;
+            document.getElementById('queueCount').innerText = filteredData.length;
+            if (donutChart) {
+                statsTrack.pending = Math.max(0, filteredData.length - (statsTrack.sent + statsTrack.failed));
+                donutChart.data.datasets[0].data = [statsTrack.pending, statsTrack.sent, statsTrack.failed];
+                donutChart.update();
+            }
+        }
+
+        function updateETA(remainingItems) {
+            if (remainingItems <= 0 || isPaused || stopRequested || !isSending) {
+                document.getElementById('etaBadge').classList.add('hidden');
+                return;
+            }
+            document.getElementById('etaBadge').classList.remove('hidden');
+            
+            let avgDelaySeconds = 0;
+            const sendMode = document.getElementById('sendMode').value;
+            
+            if (sendMode === 'wa_web') {
+                const min = parseInt(document.getElementById('minDelay').value) || 15;
+                const max = parseInt(document.getElementById('maxDelay').value) || 45;
+                avgDelaySeconds = (min + max) / 2;
+                if (document.getElementById('useTypingSpeed').checked) avgDelaySeconds += 2; 
+            } else {
+                avgDelaySeconds = 1.5; 
+            }
+
+            const totalSeconds = remainingItems * avgDelaySeconds;
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            
+            let etaText = "";
+            if (h > 0) etaText += `${h}j `;
+            etaText += `${m}m`;
+            if (h === 0 && m === 0) etaText = "< 1m";
+            
+            document.getElementById('etaTime').innerText = `ETA: ${etaText}`;
+        }
+
+        function handleStartAction() {
+            const sendMode = document.getElementById('sendMode').value;
+            
+            if (sendMode === 'meta_api') {
+                const token = document.getElementById('metaToken').value.trim();
+                const phoneId = document.getElementById('metaPhoneId').value.trim();
+                const template = document.getElementById('metaTemplateName').value.trim();
+                
+                if (!token || !phoneId || !template) {
+                    return Swal.fire('Kredensial Meta Kosong', 'Harap lengkapi Meta Access Token, Phone ID, dan Nama Template.', 'error');
+                }
+            } else {
+                if(!document.getElementById('message').value.trim()) {
+                    return Swal.fire('Pesan Kosong', 'Silakan isi kolom Teks Utama terlebih dahulu.', 'warning');
+                }
+            }
+
+            const scheduleInput = document.getElementById('scheduleTime').value;
+            if (scheduleInput && !countdownTimer && !isPaused) {
+                const targetTime = new Date(scheduleInput).getTime();
+                if (targetTime > new Date().getTime()) return startCountdown(targetTime);
+                else Swal.fire('Info', 'Waktu jadwal sudah lewat! Eksekusi seketika.', 'info');
+            }
+            startOrResumeSending();
+        }
+
+        function startCountdown(targetTime) {
+            document.getElementById('scheduleTime').disabled = true;
+            document.getElementById('btnStart').classList.replace('bg-emerald-500', 'bg-indigo-600');
+            updateBadge("MENUNGGU JADWAL", "bg-indigo-400");
+            countdownTimer = setInterval(() => {
+                const distance = targetTime - new Date().getTime();
+                if (distance <= 0) {
+                    clearInterval(countdownTimer); countdownTimer = null; document.getElementById('scheduleTime').disabled = false; startOrResumeSending(); 
+                } else {
+                    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)), m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)), s = Math.floor((distance % (1000 * 60)) / 1000);
+                    document.getElementById('btnStartText').innerText = `Terjadwal: Mulai dalam ${h}j ${m}m ${s}s`;
+                }
+            }, 1000);
+        }
+
+        function processMessage(template, userObj, applyZeroWidth = true) {
+            let processed = template.replace(/\{([^{}]+)\}/g, (m, inner) => inner.includes('|') ? inner.split('|')[Math.floor(Math.random() * inner.split('|').length)] : m);
+            const fallbackStr = document.getElementById('fallbackName').value || "";
+            for (const key in userObj) {
+                if(!['_rowIdx','_status_ui','_rawNo','_source'].includes(key)) {
+                    let val = userObj[key];
+                    if((key === 'nama' || key === 'name') && (!val || val.trim() === '')) val = fallbackStr;
+                    processed = processed.replace(new RegExp(`{${key}}`, 'gi'), val);
+                }
+            }
+
+            if(applyZeroWidth && document.getElementById('useZeroWidth').checked) {
+                const invisibleChars = '\u200B'.repeat(Math.floor(Math.random() * 5) + 1);
+                processed += invisibleChars; 
+            }
+            
+            return processed;
+        }
+
+        function setRowStatus(index, text, isSuccess) {
+            const pill = document.getElementById(`stat-${index}`); const card = document.getElementById(`row-item-${index}`);
+            if (isSuccess === true) { 
+                pill.className = "status-pill bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"; 
+                statsTrack.sent++; filteredData[index]._status_ui = 'Terkirim'; 
+                updateHealthScore(-0.5); 
+            } 
+            else if (isSuccess === false) { 
+                pill.className = "status-pill bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"; 
+                statsTrack.failed++; filteredData[index]._status_ui = 'Gagal'; 
+                updateHealthScore(-5); 
+            } 
+            else if (isSuccess === 'skip') {
+                pill.className = "status-pill bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
+                statsTrack.failed++; filteredData[index]._status_ui = text;
+            }
+            else { 
+                pill.className = "status-pill bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800 animate-pulse"; 
+                card.classList.add('border-indigo-400', 'bg-indigo-50/50', 'dark:bg-indigo-900/20', 'dark:border-indigo-500'); 
+                card.scrollIntoView({ behavior: "smooth", block: "center" }); 
+            }
+            
+            if (isSuccess !== null) { 
+                card.classList.remove('border-indigo-400', 'bg-indigo-50/50', 'dark:bg-indigo-900/20', 'dark:border-indigo-500'); 
+                updateStatsUI(); 
+            }
+            pill.innerText = text;
+        }
+
+        function startOrResumeSending() {
+            if (isPaused) {
+                isPaused = false; document.getElementById('btnPauseText').innerText = "Jeda Sistem";
+                document.getElementById('btnPause').className = "bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg transition flex justify-center items-center gap-2 text-lg";
+                updateBadge("ENGINE RUNNING", "bg-emerald-400"); return; 
+            }
+            
+            stopRequested = false; isSending = true; isPaused = false; consecutiveMetaErrors = 0;
+            document.getElementById('searchInput').disabled = true;
+            document.getElementById('btnStart').classList.add('hidden');
+            document.getElementById('playbackControls').classList.remove('hidden');
+            updateBadge("ENGINE RUNNING", "bg-emerald-400");
+            executeSendingLoop();
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const btnPause = document.getElementById('btnPause');
+            if (isPaused) {
+                document.getElementById('btnPauseText').innerText = "Lanjut Kirim";
+                btnPause.className = "bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg transition flex justify-center items-center gap-2 text-lg";
+                updateBadge("SISTEM DIJEDA", "bg-amber-400"); saveCurrentSession(); updateETA(0);
+            } else {
+                document.getElementById('btnPauseText').innerText = "Jeda Sistem";
+                btnPause.className = "bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg transition flex justify-center items-center gap-2 text-lg";
+                updateBadge("ENGINE RUNNING", "bg-emerald-400"); updateETA(filteredData.length - currentIndex);
+            }
+        }
+
+        function stopSending() {
+            Swal.fire({
+                title: 'Hentikan Pengiriman?',
+                text: "Anda dapat melanjutkan antrean ini nanti melalui fitur Auto-Recovery.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hentikan'
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    stopRequested = true; isPaused = false; 
+                    if(countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; document.getElementById('scheduleTime').disabled = false; finishExecution(true); }
+                    updateBadge("STOPPED", "bg-red-500");
+                    updateETA(0);
+                }
+            });
+        }
+
+        async function executeSendingLoop() {
+            const batchLimit = parseInt(document.getElementById('batchSize').value) || 50;
+            const restMinutes = parseInt(document.getElementById('restTime').value) || 10;
+            const interventionLimit = parseInt(document.getElementById('interventionLimit').value) || 0;
+            const userApi = document.getElementById('userApiUrl').value.trim();
+            const sendMode = document.getElementById('sendMode').value;
+            
+            const msgTemplateRaw = document.getElementById('message').value;
+            const mediaUrlRaw = document.getElementById('mediaUrl').value.trim();
+            const fallbackStr = document.getElementById('fallbackName').value || "";
+            
+            // Meta API Credentials
+            const metaToken = document.getElementById('metaToken').value.trim();
+            const metaPhoneId = document.getElementById('metaPhoneId').value.trim();
+            const metaTemplateName = document.getElementById('metaTemplateName').value.trim();
+            const metaBtnParamRaw = document.getElementById('metaButtonParam').value.trim();
+            
+            // Mengambil data Blacklist dari SecureStore
+            const blacklistDB = SecureStore.get('wa_blacklist') || [];
+            
+            for (; currentIndex < filteredData.length; currentIndex++) {
+                updateETA(filteredData.length - currentIndex);
+                
+                while (isOutsideWorkingHours() && !stopRequested) {
+                    updateBadge("ZzZ DILUAR JAM KERJA", "bg-slate-600");
+                    if(!document.getElementById('temp-delay')) createDelayLog(currentIndex, `⏰ Sistem tidur. Menunggu Jam Operasional...`);
+                    await new Promise(r => setTimeout(r, 60000)); 
+                }
+
+                if (stopRequested) break;
+                while (isPaused && !stopRequested) await new Promise(r => setTimeout(r, 500)); 
+                if (stopRequested) break;
+
+                const user = filteredData[currentIndex];
+                if(user._status_ui === 'Terkirim' || user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Diabaikan (Blacklist)') continue;
+
+                // Cek Blacklist (Opt-out) System
+                if(blacklistDB.includes(user.no)) {
+                    setRowStatus(currentIndex, "Diabaikan (Blacklist)", 'skip');
+                    continue;
+                }
+
+                setRowStatus(currentIndex, "Memproses", null);
+                
+                let isSendSuccess = false;
+
+                // 1. MEMBUAT LAMPIRAN DINAMIS (Berdasarkan variabel user)
+                let finalMediaUrl = "";
+                if (mediaUrlRaw) {
+                    finalMediaUrl = processMessage(mediaUrlRaw, user, false); // Parse URL, hilangkan ZeroWidth
+                }
+
+                // 2. LOGIKA PENGIRIMAN
+                if (sendMode === 'wa_web') {
+                    let finalMsg = processMessage(msgTemplateRaw, user, true);
+                    
+                    // Injeksi URL Lampiran ke Teks jika WA Web
+                    if (finalMediaUrl) finalMsg += `\n\n📄 *Dokumen Lampiran:*\n${finalMediaUrl}`;
+                    
+                    window.open(`https://wa.me/${user.no}?text=${encodeURIComponent(finalMsg)}`, '_blank');
+                    isSendSuccess = true; 
+                } 
+                else if (sendMode === 'meta_api') {
+                    try {
+                        let componentsArray = [];
+                        
+                        // A. DETEKSI DOKUMEN/GAMBAR LAMPIRAN UNTUK META API
+                        if(finalMediaUrl) {
+                            let mediaType = "document";
+                            const lowerUrl = finalMediaUrl.toLowerCase();
+                            if(lowerUrl.match(/\.(jpeg|jpg|png|webp)$/)) mediaType = "image";
+                            else if(lowerUrl.match(/\.(mp4|3gp)$/)) mediaType = "video";
+                            
+                            componentsArray.push({
+                                type: "header",
+                                parameters: [{ type: mediaType, [mediaType]: { link: finalMediaUrl } }]
+                            });
+                        }
+
+                        // B. SMART VARIABLE PARSER (Untuk Body)
+                        const matches = msgTemplateRaw.match(/\{([^{}]+)\}/g) || [];
+                        let bodyParams = [];
+                        
+                        matches.forEach(m => {
+                            const varName = m.replace(/[{}]/g, '');
+                            let val = user[varName] || user[varName.toLowerCase()] || "";
+                            if((varName.toLowerCase() === 'nama' || varName.toLowerCase() === 'name') && !val) val = fallbackStr;
+                            bodyParams.push({ type: "text", text: String(val).substring(0, 1024) });
+                        });
+
+                        if(bodyParams.length === 0) {
+                            let userDynamicName = user.nama || user.name || fallbackStr || "Pelanggan";
+                            bodyParams.push({ type: "text", text: String(userDynamicName).substring(0, 1024) });
+                        }
+                        
+                        componentsArray.push({ type: "body", parameters: bodyParams });
+
+                        // C. DYNAMIC URL BUTTON PARSER UNTUK META API
+                        if(metaBtnParamRaw) {
+                            let btnParamValue = processMessage(metaBtnParamRaw, user, false);
+                            if(btnParamValue) {
+                                componentsArray.push({
+                                    type: "button",
+                                    sub_type: "url",
+                                    index: "0", 
+                                    parameters: [{ type: "text", text: String(btnParamValue).substring(0, 1024) }]
+                                });
+                            }
+                        }
+
+                        const payload = {
+                            messaging_product: "whatsapp",
+                            to: user.no,
+                            type: "template",
+                            template: {
+                                name: metaTemplateName,
+                                language: { code: "id" },
+                                components: componentsArray
+                            }
+                        };
+
+                        const response = await fetch(`https://graph.facebook.com/v19.0/${metaPhoneId}/messages`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${metaToken}`, 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        const resJson = await response.json();
+                        
+                        if (resJson.messages && resJson.messages.length > 0) {
+                            isSendSuccess = true;
+                        } else {
+                            isSendSuccess = false;
+                            console.error("Meta API Error for " + user.no + ":", resJson);
+                        }
+                    } catch (err) {
+                        isSendSuccess = false;
+                        console.error("Fetch Meta Error:", err);
+                    }
+                }
+
+                setRowStatus(currentIndex, isSendSuccess ? "Terkirim" : "Gagal", isSendSuccess);
+                
+                if (isSendSuccess) {
+                    consecutiveMetaErrors = 0; // Reset error counter
+                    batchSendCounter++;
+                    if(batchSendCounter % 5 === 0) saveCurrentSession();
+                    
+                    if (user._source !== 'CSV' && userApi !== '') {
+                        try {
+                            const finalStatusStr = (sendMode === 'meta_api') ? "Terkirim API - " : "Terkirim Web - ";
+                            fetch(userApi, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                body: JSON.stringify({ action: 'updateStatus', rowIdx: user._rowIdx, status: finalStatusStr + new Date().toLocaleTimeString() })
+                            });
+                        } catch(e) {}
+                    }
+                } else if (sendMode === 'meta_api') {
+                    // CIRCUIT BREAKER LOGIC (Auto-Pause)
+                    consecutiveMetaErrors++;
+                    if (consecutiveMetaErrors >= 3) {
+                        isPaused = true;
+                        updateBadge("API ERROR LIMIT", "bg-red-500");
+                        try { alertAudio.play(); } catch(e){} 
+                        await Swal.fire('Meta API Terblokir', 'Sistem mendeteksi 3 kegagalan beruntun dari Meta API. Eksekusi dijeda otomatis untuk mencegah "Spam Flag". Silakan periksa kredensial, saldo, atau template Anda.', 'error');
+                        togglePause(); // Ensure UI state is updated
+                        consecutiveMetaErrors = 0;
+                        continue; 
+                    }
+                }
+
+                if (sendMode === 'wa_web') {
+                    if (interventionLimit > 0 && batchSendCounter % interventionLimit === 0 && currentIndex < filteredData.length - 1 && !stopRequested) {
+                        isPaused = true;
+                        updateBadge("⚠️ BUTUH INTERVENSI MANUAL", "bg-red-500");
+                        try { alertAudio.play(); } catch(e){} 
+                        
+                        await Swal.fire({
+                            title: 'Intervensi Anti-Ban',
+                            text: `Sistem telah mengirim ${interventionLimit} pesan.\n\nUntuk menjaga rasio Inbound akun Anda, silakan cek HP dan balas 2-3 pesan masuk pelanggan secara manual.`,
+                            icon: 'warning',
+                            confirmButtonText: 'Selesai, Lanjut Kirim',
+                            confirmButtonColor: '#4f46e5'
+                        });
+                        
+                        updateHealthScore(30); 
+                        togglePause(); 
+                        continue; 
+                    }
+
+                    if (batchSendCounter >= batchLimit && currentIndex < filteredData.length - 1 && !stopRequested) {
+                        const restMs = restMinutes * 60 * 1000;
+                        updateBadge(`ISTIRAHAT ${restMinutes} MNT`, "bg-indigo-400");
+                        const restLog = createDelayLog(currentIndex, `🛌 Istirahat sistem (${restMinutes} menit)...`);
+                        const endRest = Date.now() + restMs;
+                        while(Date.now() < endRest) { if (stopRequested) break; updateETA((filteredData.length - currentIndex)); await new Promise(r => setTimeout(r, 1000)); }
+                        if(restLog) restLog.remove(); batchSendCounter = 0; 
+                        
+                        updateHealthScore(20); 
+
+                        if(!stopRequested && !isPaused) updateBadge("ENGINE RUNNING", "bg-emerald-400");
+                    } 
+                    else if (currentIndex < filteredData.length - 1 && !stopRequested) {
+                        let min = parseInt(document.getElementById('minDelay').value) || 10;
+                        let max = parseInt(document.getElementById('maxDelay').value) || 30;
+                        
+                        if (document.getElementById('useWarmup').checked && currentIndex < 20) {
+                            min *= 2; max *= 2;
+                        }
+
+                        let delaySeconds = Math.floor(Math.random() * (Math.max(min, max) - Math.min(min, max) + 1) + Math.min(min, max));
+                        let delayMs = delaySeconds * 1000;
+
+                        let typingTextLog = "";
+                        if(document.getElementById('useTypingSpeed').checked) {
+                            const msgLength = msgTemplateRaw.length || 50;
+                            const typingMs = msgLength * 40; 
+                            delayMs += typingMs;
+                            typingTextLog = `+ Ketik: ${Math.floor(typingMs/1000)}s`;
+                        }
+
+                        const delayLog = createDelayLog(currentIndex, `⏳ Jeda pengiriman: ${Math.floor(delayMs/1000)}s ${typingTextLog}`);
+                        const endTime = Date.now() + delayMs;
+                        while(Date.now() < endTime) { if (stopRequested) break; await new Promise(r => setTimeout(r, 200)); }
+                        if(delayLog) delayLog.remove();
+                    }
+                } else {
+                    if (currentIndex < filteredData.length - 1 && !stopRequested) {
+                        const delayLog = createDelayLog(currentIndex, `⚡ Memproses antrean API Meta...`);
+                        await new Promise(r => setTimeout(r, 1500));
+                        if(delayLog) delayLog.remove();
+                    }
+                }
+            }
+            finishExecution(stopRequested);
+        }
+
+        function createDelayLog(index, text) {
+            const delayLog = document.createElement('div'); delayLog.id = 'temp-delay';
+            delayLog.className = "flex items-center justify-center text-[10px] text-slate-400 dark:text-slate-500 py-2 bg-slate-100 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-600 rounded-xl mx-2 font-medium transition-colors";
+            delayLog.innerHTML = `<span>${text}</span>`;
+            document.getElementById(`row-item-${index}`).insertAdjacentElement('afterend', delayLog);
+            delayLog.scrollIntoView({ behavior: "smooth", block: "center" }); return delayLog;
+        }
+
+        function finishExecution(isStoppedManually = false) {
+            isSending = false; document.getElementById('searchInput').disabled = false;
+            document.getElementById('playbackControls').classList.add('hidden');
+            const btnStart = document.getElementById('btnStart'); btnStart.classList.remove('hidden');
+            updateETA(0);
+
+            if (isStoppedManually) {
+                btnStart.className = "w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all duration-300 flex justify-center items-center gap-2 text-lg";
+                document.getElementById('btnStartText').innerText = "Lanjutkan Sisa Antrean";
+                updateBadge("STANDBY", "bg-slate-400"); saveCurrentSession();
+            } else {
+                updateBadge("COMPLETED", "bg-emerald-400");
+                btnStart.className = "w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold py-4 rounded-xl transition cursor-not-allowed flex justify-center items-center gap-2 text-lg";
+                btnStart.disabled = true; document.getElementById('btnStartText').innerText = "Sesi Selesai 100%";
+                clearCurrentSession();
+                Swal.fire('Selesai!', 'Semua pesan dalam antrean telah dieksekusi.', 'success');
+            }
+            isPaused = false; document.getElementById('btnPauseText').innerText = "Jeda Sistem"; document.getElementById('btnPause').classList.replace('bg-emerald-500', 'bg-amber-500');
+        }
+
+        function exportCSV() {
+            if(filteredData.length === 0) return;
+            const headers = Object.keys(filteredData[0]).filter(k => k !== '_rowIdx' && k !== '_rawNo' && k !== '_source');
+            let csvContent = "data:text/csv;charset=utf-8," + headers.map(h => h === '_status_ui' ? 'Status_Akhir' : h).join(",") + "\n";
+            filteredData.forEach(row => {
+                csvContent += headers.map(key => {
+                    let cell = row[key] ? String(row[key]).replace(/"/g, '""') : "";
+                    return cell.search(/("|,|\n)/g) >= 0 ? `"${cell}"` : cell;
+                }).join(",") + "\n";
+            });
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `WA_Dashboard_Log_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
