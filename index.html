@@ -167,13 +167,14 @@
                 </select>
             </div>
 
-            <!-- API KLIEN UNTUK DATA KONTAK -->
+            <!-- API KLIEN / LINK GOOGLE SHEETS -->
             <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                 <label class="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 transition-colors">
-                    <span class="flex items-center gap-1"><svg class="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> Database Kontak Klien</span>
+                    <span class="flex items-center gap-1"><svg class="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> Link Database Google Sheets</span>
                     <button type="button" onclick="testClientApi()" class="text-[9px] font-bold text-indigo-500 hover:text-indigo-600 underline">Test Ping</button>
                 </label>
-                <input type="url" id="userApiUrl" placeholder="Paste URL Web App Google Sheets Anda..." class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 text-indigo-900 dark:text-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 p-2 text-xs shadow-sm transition-colors placeholder-indigo-300 dark:placeholder-indigo-700/50">
+                <input type="url" id="userApiUrl" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 text-indigo-900 dark:text-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 p-2 text-xs shadow-sm transition-colors placeholder-indigo-300 dark:placeholder-indigo-700/50">
+                <p class="text-[8px] text-slate-400 mt-1 leading-tight">Pastikan akses share Sheet disetel ke <strong>"Siapa saja yang memiliki link"</strong>. <i>(Mendukung Link GSheets langsung atau Web App GAS)</i>.</p>
             </div>
 
             <!-- MODE PENGIRIMAN -->
@@ -727,7 +728,6 @@
                 if (s.valid) cleanNumbers.push(s.clean);
             });
             
-            // Remove duplicates
             const uniqueBl = [...new Set(cleanNumbers)];
             SecureStore.set('wa_blacklist', uniqueBl);
             updateBlacklistCount();
@@ -747,20 +747,40 @@
         // ==========================================
         async function testClientApi() {
             const url = document.getElementById('userApiUrl').value.trim();
-            if(!url) return Swal.fire('Kolom Kosong', 'Harap isi URL API Google Sheets Anda.', 'warning');
+            if(!url) return Swal.fire('Kolom Kosong', 'Harap isi URL Link Google Sheets atau Web App Anda.', 'warning');
             
             Swal.fire({ title: 'Menguji Koneksi...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             
             try {
-                const res = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'getContacts' }) });
-                const data = await res.json();
-                if(data.status === 'success') {
-                    Swal.fire('Koneksi Berhasil!', `API merespons dengan baik. Ditemukan ${data.data.length} data kontak.`, 'success');
+                if (url.includes('script.google.com')) {
+                    const res = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'getContacts' }) });
+                    const data = await res.json();
+                    if(data.status === 'success') Swal.fire('Koneksi Berhasil!', `API merespons dengan baik. Ditemukan ${data.data.length} data kontak.`, 'success');
+                    else Swal.fire('Koneksi Gagal', data.message || 'Respon API tidak valid.', 'error');
+                } else if (url.includes('docs.google.com/spreadsheets')) {
+                    const sheetIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    if (!sheetIdMatch) throw new Error("Link Sheet tidak valid.");
+                    const gidMatch = url.match(/[#&]gid=([0-9]+)/);
+                    const gidParam = gidMatch ? `&gid=${gidMatch[1]}` : '';
+                    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetIdMatch[1]}/gviz/tq?tqx=out:csv${gidParam}`;
+                    
+                    const response = await fetch(csvUrl);
+                    if (response.ok) {
+                        const txt = await response.text();
+                        if (txt.trim().startsWith('<!DOCTYPE html>')) throw new Error("Akses Ditolak. Pastikan Share = Anyone with link.");
+                        Swal.fire('Koneksi Berhasil!', `Link Google Sheets valid dan dapat dibaca.`, 'success');
+                    } else {
+                        throw new Error("Gagal mengambil data CSV dari Google Sheets.");
+                    }
                 } else {
-                    Swal.fire('Koneksi Gagal', data.message || 'Respon API tidak valid.', 'error');
+                    throw new Error("Format URL tidak dikenali.");
                 }
             } catch(e) {
-                Swal.fire('Error API', 'Gagal menghubungi server URL Klien. Pastikan URL sudah benar dan di-deploy sebagai Anyone.', 'error');
+                let errorMsg = e.message || 'Gagal menghubungi server URL Klien.';
+                if (errorMsg.includes('Failed to fetch')) {
+                    errorMsg = 'Koneksi diblokir (Failed to fetch). Hal ini biasanya terjadi karena Akses Share Google Sheets masih "Restricted", atau ada ekstensi Browser (AdBlocker) yang memblokir request.';
+                }
+                Swal.fire('Error Koneksi', errorMsg, 'error');
             }
         }
 
@@ -788,9 +808,6 @@
             }
         }
 
-        // ==========================================
-        // SECURITY: SESSION WATCHDOG (AUTO-LOGOUT)
-        // ==========================================
         function initSecurityWatchdog() {
             let idleTime = 0;
             const resetTimer = () => { idleTime = 0; };
@@ -1078,27 +1095,44 @@
             const statusList = document.getElementById('statusList');
             statusList.innerHTML = '<div class="text-center mt-14"><p class="text-teal-600 dark:text-teal-400 text-sm animate-pulse font-semibold">Memproses file CSV Lokal...</p></div>';
 
-            reader.onload = function(e) { processCSVData(e.target.result); event.target.value = ''; };
+            reader.onload = function(e) { processCSVData(e.target.result, "CSV"); event.target.value = ''; };
             reader.onerror = function() { Swal.fire('Error', 'Gagal membaca file CSV.', 'error'); statusList.innerHTML = '<p class="text-slate-400">Silakan coba lagi.</p>'; };
             reader.readAsText(file);
         }
 
-        function processCSVData(csvText) {
+        // ==========================================
+        // SMART CSV PARSER (Menangani Koma dalam Kutip)
+        // ==========================================
+        function processCSVData(csvText, sourceName = "CSV") {
             const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
-            if (lines.length < 2) return Swal.fire('Data Kosong', 'File CSV kosong atau tidak memiliki header.', 'warning');
+            if (lines.length < 2) return Swal.fire('Data Kosong', 'Data kosong atau tidak memiliki header.', 'warning');
 
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+            // Parser khusus untuk menangani CSV yang field-nya di-wrap tanda kutip
+            function parseCSVRow(str) {
+                let result = [], inQuotes = false, current = '';
+                for (let i = 0; i < str.length; i++) {
+                    let char = str[i];
+                    if (char === '"' && str[i+1] === '"') { current += '"'; i++; } // Escaped quote
+                    else if (char === '"') { inQuotes = !inQuotes; }
+                    else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
+                    else { current += char; }
+                }
+                result.push(current);
+                return result;
+            }
+
+            const headers = parseCSVRow(lines[0]).map(h => h.trim().toLowerCase());
             const parsedData = [];
 
             for (let i = 1; i < lines.length; i++) {
-                const currentLine = lines[i].split(',');
+                const currentLine = parseCSVRow(lines[i]);
                 const obj = { _rowIdx: i + 1 }; 
                 for (let j = 0; j < headers.length; j++) {
-                    if (headers[j]) obj[headers[j]] = currentLine[j] ? currentLine[j].trim().replace(/^"|"$/g, '') : "";
+                    if (headers[j]) obj[headers[j]] = currentLine[j] ? currentLine[j].trim() : "";
                 }
                 parsedData.push(obj);
             }
-            handleDataSuccess(parsedData, "CSV");
+            handleDataSuccess(parsedData, sourceName);
         }
 
         function initThemeIcons() {
@@ -1207,7 +1241,6 @@
             document.getElementById('workEnd').value = prof.workEnd || '22:00';
             document.getElementById('interventionLimit').value = prof.interventionLimit || 40;
             
-            // Load Meta specific config
             if(prof.metaButtonParam !== undefined) {
                 document.getElementById('metaButtonParam').value = prof.metaButtonParam;
             }
@@ -1249,16 +1282,17 @@
             });
         }
 
-        // IMPROVED: Number Validator (Mendeteksi format yang jelas salah)
+        // ==========================================
+        // HYBRID GSHEETS CONNECTOR
+        // ==========================================
         function sanitizeNumber(rawString) {
             if (!rawString) return { valid: false, clean: "" };
             let cleanStr = String(rawString).replace(/\D/g, '');
             if (cleanStr.startsWith('0')) cleanStr = '62' + cleanStr.substring(1);
             
-            // Heuristic checks
             if (cleanStr.length < 9 || cleanStr.length > 15) return { valid: false, clean: cleanStr };
-            if (/^(\d)\1{6,}$/.test(cleanStr.substring(2))) return { valid: false, clean: cleanStr }; // Deteksi digit berulang (contoh: 6288888888)
-            if (cleanStr === '62123456789' || cleanStr === '62000000000') return { valid: false, clean: cleanStr }; // Nomor dummy umum
+            if (/^(\d)\1{6,}$/.test(cleanStr.substring(2))) return { valid: false, clean: cleanStr }; 
+            if (cleanStr === '62123456789' || cleanStr === '62000000000') return { valid: false, clean: cleanStr }; 
             
             return { valid: true, clean: cleanStr };
         }
@@ -1268,7 +1302,7 @@
 
             if(!userApi || userApi === "") {
                 Swal.fire({
-                    title: 'API Kontak Kosong', text: 'URL API Kontak (Google Sheets Anda) belum diisi di Sidebar kiri.', icon: 'warning', confirmButtonColor: '#059669'
+                    title: 'Database Kosong', text: 'Silakan masukkan Link Google Sheets (Pastikan akses Share disetel ke Anyone with link) atau URL Web App Anda.', icon: 'warning', confirmButtonColor: '#059669'
                 });
                 return;
             }
@@ -1276,27 +1310,59 @@
             const btnLoad = document.getElementById('btnLoad');
             const icon = document.getElementById('loadIcon');
             btnLoad.disabled = true; icon.classList.add('animate-spin');
-            document.getElementById('statusList').innerHTML = '<div class="text-center mt-14"><p class="text-indigo-600 dark:text-indigo-400 text-sm animate-pulse font-semibold">Terkoneksi ke Database Klien... Mengunduh & Validasi.</p></div>';
+            document.getElementById('statusList').innerHTML = '<div class="text-center mt-14"><p class="text-indigo-600 dark:text-indigo-400 text-sm animate-pulse font-semibold">Mengunduh Data Database Klien...</p></div>';
 
             try {
-                const response = await fetch(userApi, {
-                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getContacts' })
-                });
+                if (userApi.includes('script.google.com')) {
+                    // METODE LAMA: Apps Script Web App
+                    const response = await fetch(userApi, {
+                        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'getContacts' })
+                    });
+                    const responseText = await response.text();
+                    const result = JSON.parse(responseText);
 
-                const responseText = await response.text();
-                const result = JSON.parse(responseText);
+                    if (result.status === 'success') {
+                        handleDataSuccess(result.data, "API WebApp");
+                    } else {
+                        throw new Error(result.message || "Gagal memuat data dari server Web App.");
+                    }
+                } else if (userApi.includes('docs.google.com/spreadsheets')) {
+                    // METODE BARU: Direct Google Sheet Link (Gviz CSV)
+                    const sheetIdMatch = userApi.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    if (!sheetIdMatch) throw new Error("Link Google Sheets tidak valid. Pastikan link di-copy dengan benar.");
+                    const sheetId = sheetIdMatch[1];
+                    
+                    const gidMatch = userApi.match(/[#&]gid=([0-9]+)/);
+                    const gidParam = gidMatch ? `&gid=${gidMatch[1]}` : '';
 
-                if (result.status === 'success') {
-                    handleDataSuccess(result.data, "API Server");
+                    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv${gidParam}`;
+                    
+                    const response = await fetch(csvUrl);
+                    if (!response.ok) throw new Error("Gagal mengakses Sheet. Pastikan setelan Share adalah 'Siapa saja yang memiliki link' (Anyone with link).");
+                    
+                    const csvText = await response.text();
+                    
+                    if (csvText.trim().startsWith('<!DOCTYPE html>')) {
+                        throw new Error("Akses Ditolak. Pastikan Share setelan Google Sheets diubah dari 'Restricted' menjadi 'Anyone with the link'.");
+                    }
+                    
+                    processCSVData(csvText, "GSheets Direct");
+                    
                 } else {
-                    throw new Error(result.message || "Gagal memuat data dari server.");
+                    throw new Error("Format URL tidak dikenali. Masukkan Link Google Sheets atau Web App App Script yang valid.");
                 }
             } catch (error) {
                 console.error("Sync Error:", error);
                 let errorMsg = error.message;
                 let suggestion = "Gagal terhubung ke Database Google Sheets pengguna.";
-                if (errorMsg.includes('DataKontak')) { suggestion = "Solusi: Buka file Google Sheets API Kontak Anda, buat tab (sheet) dengan nama 'DataKontak' (tanpa spasi), dan pastikan ada data kontak di dalamnya."; }
+                
+                if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+                    errorMsg = "Koneksi diblokir oleh Browser atau Google (Failed to fetch).";
+                    suggestion = "Solusi Cepat:\n1. Klik tombol 'Share' (Bagikan) di Google Sheets Anda.\n2. Ubah Akses dari 'Restricted' (Dibatasi) menjadi 'Anyone with the link' (Siapa saja yang memiliki link).\n3. Matikan AdBlocker / Ekstensi Privasi Anda sejenak.";
+                } else if (errorMsg.includes('DataKontak')) {
+                    suggestion = "Solusi: Buka file Google Sheets API Kontak Anda, buat tab (sheet) dengan nama 'DataKontak' (tanpa spasi), dan pastikan ada data kontak di dalamnya.";
+                }
 
                 Swal.fire('Sinkronisasi Gagal', errorMsg + "\n\n" + suggestion, 'error');
                 btnLoad.disabled = false; icon.classList.remove('animate-spin');
@@ -1352,7 +1418,7 @@
             statsTrack.health = 100; updateHealthUI(); applyFilter(); clearCurrentSession(); 
             document.getElementById('btnRecover').classList.add('hidden'); document.getElementById('btnRecover').classList.remove('flex');
             
-            Swal.fire({ icon: 'success', title: 'Data Berhasil Dimuat', text: `${filteredData.length} kontak valid siap dieksekusi.`, timer: 2000, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: 'Data Berhasil Dimuat', text: `${filteredData.length} kontak valid siap dieksekusi dari ${source}.`, timer: 2000, showConfirmButton: false });
         }
 
         function renderVariableChips() {
@@ -1406,7 +1472,10 @@
                     pillClass = "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
                 }
                 
-                let sourceBadge = user._source === 'CSV' ? `<span class="bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-teal-200 dark:border-teal-800">CSV</span>` : `<span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-indigo-200 dark:border-indigo-800">API</span>`;
+                let sourceBadge = "";
+                if(user._source === 'CSV') sourceBadge = `<span class="bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-teal-200 dark:border-teal-800">CSV</span>`;
+                else if(user._source === 'GSheets Direct') sourceBadge = `<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-green-200 dark:border-green-800">GSheets</span>`;
+                else sourceBadge = `<span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-indigo-200 dark:border-indigo-800">API</span>`;
 
                 log.className = "flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition cursor-pointer group";
                 log.onclick = () => showLivePreview(i);
@@ -1462,7 +1531,7 @@
 
             if (mediaUrlRaw) {
                 let dynamicUrl = processMessage(mediaUrlRaw, user, false);
-                attachmentUI.innerHTML = `📎 <strong>Lampiran:</strong><br><a href="#" class="text-indigo-500 underline">${dynamicUrl}</a>`;
+                attachmentUI.innerHTML = `📎 <strong>Lampiran:</strong><br><a href="#" class="text-indigo-500 underline break-words">${dynamicUrl}</a>`;
                 attachmentUI.classList.remove('hidden');
             } else {
                 attachmentUI.classList.add('hidden');
@@ -1832,7 +1901,7 @@
                     batchSendCounter++;
                     if(batchSendCounter % 5 === 0) saveCurrentSession();
                     
-                    if (user._source !== 'CSV' && userApi !== '') {
+                    if (user._source !== 'CSV' && user._source !== 'GSheets Direct' && userApi !== '' && userApi.includes('script.google.com')) {
                         try {
                             const finalStatusStr = (sendMode === 'meta_api') ? "Terkirim API - " : "Terkirim Web - ";
                             fetch(userApi, {
