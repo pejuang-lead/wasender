@@ -45,6 +45,16 @@
         
         /* Custom SweetAlert Z-Index for Modal Overlaps */
         .swal2-container { z-index: 10000 !important; }
+
+        /* Print Styles for Executive Report */
+        @media print {
+            body * { visibility: hidden; }
+            #reportModal, #reportModal * { visibility: visible; }
+            #reportModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: white; z-index: 999999; }
+            .no-print { display: none !important; }
+            .print-text-dark { color: #1e293b !important; }
+            .print-bg-light { background-color: white !important; }
+        }
     </style>
     
     <script>
@@ -119,16 +129,99 @@
                 </h3>
                 <button onclick="closeBlacklist()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div class="p-5 overflow-y-auto">
+            <div class="p-5 overflow-y-auto flex-1">
                 <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Masukkan nomor WhatsApp pelanggan yang meminta berhenti berlangganan (Opt-out). Sistem akan mengabaikan pengiriman ke nomor-nomor ini secara otomatis.</p>
                 <textarea id="blacklistInput" rows="8" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:ring-red-500 focus:border-red-500 p-3 text-sm shadow-sm dark:shadow-inner transition-colors font-mono" placeholder="08123456789&#10;628987654321&#10;... (pisahkan dengan baris baru atau koma)"></textarea>
                 <div class="mt-2 flex justify-between items-center">
                     <span class="text-[10px] font-bold text-slate-500" id="blacklistCount">Total Terdaftar: 0</span>
+                    <button onclick="clearDeadCache()" class="text-[9px] font-bold text-amber-500 hover:text-amber-600 underline">Bersihkan Auto-Cache (Nomor Invalid)</button>
                 </div>
             </div>
             <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex justify-end gap-2">
                 <button onclick="closeBlacklist()" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors">Batal</button>
                 <button onclick="saveBlacklist()" class="px-4 py-2 text-xs font-bold bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-md transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> Simpan Blacklist</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL MANUAL INPUT (PASTE NUMBERS)         -->
+    <!-- ========================================== -->
+    <div id="manualInputModal" class="fixed inset-0 z-[110] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all relative flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
+                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    Input Target Manual
+                </h3>
+                <button onclick="closeManualInput()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Paste kumpulan nomor WhatsApp target Anda di bawah ini. Pisahkan setiap nomor dengan baris baru (Enter). <br><br>💡 <b>Tips Cerdas:</b> Jika ingin memasukkan nama sekalian, gunakan format: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded text-indigo-500">0812xxx;Budi</code> (gunakan titik koma atau koma untuk memisahkan Nomor dan Nama).</p>
+                <textarea id="manualInputText" rows="8" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm shadow-sm dark:shadow-inner transition-colors font-mono whitespace-nowrap overflow-x-auto" placeholder="08123456789&#10;628987654321;John Doe&#10;..."></textarea>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex justify-end gap-2">
+                <button onclick="closeManualInput()" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors">Batal</button>
+                <button onclick="processManualInput()" class="px-4 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Proses Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL EXECUTIVE GRAPHICAL REPORT           -->
+    <!-- ========================================== -->
+    <div id="reportModal" class="fixed inset-0 z-[120] bg-slate-900/90 backdrop-blur-md hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all relative flex flex-col max-h-[90vh] print-bg-light">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50 no-print">
+                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-lg">
+                    <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Laporan Eksekutif Kampanye
+                </h3>
+                <div class="flex gap-2">
+                    <button onclick="printReport()" class="px-4 py-2 text-xs font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 rounded-lg transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak PDF</button>
+                    <button onclick="closeReport()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1 print-bg-light" id="reportPrintArea">
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-black text-slate-800 dark:text-white print-text-dark">WA Enterprise - Ringkasan Kampanye</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1" id="reportDate">Dicetak pada: -</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl text-center border border-indigo-100 dark:border-indigo-800/30">
+                        <p class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Total Target</p>
+                        <h3 class="text-3xl font-black text-indigo-900 dark:text-indigo-300 mt-1 print-text-dark" id="repTotal">0</h3>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl text-center border border-emerald-100 dark:border-emerald-800/30">
+                        <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Sukses Terkirim</p>
+                        <h3 class="text-3xl font-black text-emerald-900 dark:text-emerald-300 mt-1 print-text-dark" id="repSent">0</h3>
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-800/30">
+                        <p class="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">Gagal / Dilewati</p>
+                        <h3 class="text-3xl font-black text-red-900 dark:text-red-300 mt-1 print-text-dark" id="repFailed">0</h3>
+                    </div>
+                    <div class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl text-center border border-amber-100 dark:border-amber-800/30">
+                        <p class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">Rasio Sukses</p>
+                        <h3 class="text-3xl font-black text-amber-900 dark:text-amber-300 mt-1 print-text-dark" id="repRate">0%</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm">
+                        <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-4 text-center">Distribusi Pengiriman</h4>
+                        <div class="h-64 relative">
+                            <canvas id="barChartCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm flex flex-col justify-center">
+                        <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-4 text-center">Performa A/B Testing</h4>
+                        <div id="abTestReportUI" class="space-y-4">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -156,14 +249,14 @@
             <!-- 1. Campaign Profile -->
             <div>
                 <div class="flex justify-between items-end mb-2">
-                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Profil Workspace</label>
+                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Profil Kampanye</label>
                     <div class="flex gap-1">
                         <button onclick="saveCampaignProfile()" class="text-[10px] bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500 hover:text-indigo-800 dark:hover:text-white px-2 py-1 rounded transition border border-indigo-200 dark:border-indigo-500/30 font-medium">Simpan</button>
                         <button onclick="deleteCampaignProfile()" class="text-[10px] bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-500 hover:text-red-800 dark:hover:text-white px-2 py-1 rounded transition border border-red-200 dark:border-red-500/30 font-medium">Hapus</button>
                     </div>
                 </div>
                 <select id="campaignSelect" onchange="loadCampaignProfile()" class="w-full text-sm border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 py-2 cursor-pointer shadow-sm dark:shadow-inner transition-colors">
-                    <option value="">-- Pilih Profil Kampanye --</option>
+                    <option value="">-- Pilih Kampanye --</option>
                 </select>
             </div>
 
@@ -174,7 +267,6 @@
                     <button type="button" onclick="testClientApi()" class="text-[9px] font-bold text-indigo-500 hover:text-indigo-600 underline">Test Ping</button>
                 </label>
                 <input type="url" id="userApiUrl" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 text-indigo-900 dark:text-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 p-2 text-xs shadow-sm transition-colors placeholder-indigo-300 dark:placeholder-indigo-700/50">
-                <p class="text-[8px] text-slate-400 mt-1 leading-tight">Pastikan akses share Sheet disetel ke <strong>"Siapa saja yang memiliki link"</strong>. <i>(Mendukung Link GSheets langsung atau Web App GAS)</i>.</p>
             </div>
 
             <!-- MODE PENGIRIMAN -->
@@ -191,9 +283,25 @@
                 <div>
                     <label class="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 transition-colors">
                         <span>📝 Teks Utama / Variabel Meta</span>
-                        <span class="text-emerald-600 dark:text-emerald-400 font-normal normal-case">Spintax & Variabel</span>
+                        <button onclick="applyMagicSpintax()" type="button" class="text-emerald-600 dark:text-emerald-400 font-bold normal-case flex items-center gap-1 hover:text-emerald-700 transition-colors bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">✨ Magic Spintax</button>
                     </label>
                     <textarea id="message" oninput="analyzeSpamScore()" rows="5" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm shadow-sm dark:shadow-inner transition-colors placeholder-slate-400 dark:placeholder-slate-600" placeholder="{Halo|Hai} {nama}, ..."></textarea>
+                    
+                    <!-- A/B TESTING TOGGLE -->
+                    <div class="mt-2 mb-2 flex items-center justify-between bg-indigo-50/50 dark:bg-indigo-900/10 p-2 rounded border border-indigo-100 dark:border-indigo-800/30">
+                        <label for="abTestToggle" class="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 cursor-pointer">🔀 Aktifkan A/B Split Testing</label>
+                        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                          <input type="checkbox" id="abTestToggle" onchange="toggleABTest()" class="sr-only peer">
+                          <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600 transition-colors"></div>
+                        </label>
+                    </div>
+
+                    <div id="abTestContainer" class="hidden mt-2">
+                        <label class="flex justify-between text-[10px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mb-1.5 transition-colors">
+                            <span>📝 Variasi Teks B (A/B Test)</span>
+                        </label>
+                        <textarea id="messageB" oninput="analyzeSpamScore()" rows="4" class="w-full border-indigo-200 dark:border-indigo-700/50 rounded-lg bg-indigo-50/30 dark:bg-indigo-900/10 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 p-3 text-sm shadow-sm transition-colors placeholder-slate-400" placeholder="Variasi pesan/template kedua untuk dites..."></textarea>
+                    </div>
                     
                     <div id="waWebConfig" class="mt-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 shadow-sm transition-colors">
                         <div class="flex justify-between items-center mb-1.5">
@@ -210,11 +318,19 @@
                     </div>
                 </div>
 
-                <!-- URL Lampiran (Dinamis) -->
+                <!-- URL Lampiran (Dinamis + Upload) -->
                 <div class="grid grid-cols-2 gap-3">
                     <div class="col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🔗 URL Lampiran (Mendukung Variabel)</label>
-                        <input type="text" id="mediaUrl" placeholder="https://domain.com/file_{resi}.pdf" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors font-mono">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🔗 URL Lampiran (Atau Upload File)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="mediaUrl" placeholder="https://domain.com/file_{resi}.pdf" class="flex-1 border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors font-mono">
+                            <input type="file" id="mediaUploadInput" accept="image/*,video/*,application/pdf" class="hidden" onchange="handleMediaUpload(event)">
+                            <button type="button" onclick="document.getElementById('mediaUploadInput').click()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-400 px-3 py-2 rounded-lg font-bold text-xs border border-indigo-200 dark:border-indigo-800 transition-colors shadow-sm flex items-center gap-1.5 whitespace-nowrap" title="Upload Gambar, Video, atau PDF ke Cloud Server">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                Upload File
+                            </button>
+                        </div>
+                        <p class="text-[8px] text-slate-400 mt-1.5 leading-tight">*Maksimal 50MB. File akan diunggah ke Public Cloud CDN agar dapat dibaca oleh API Meta WhatsApp.</p>
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🛡️ Fallback {nama}</label>
@@ -243,10 +359,17 @@
                             <input type="text" id="metaPhoneId" placeholder="1234567890" class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 shadow-sm transition-colors">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">📋 Nama Template</label>
+                            <label class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">📋 Nama Template A</label>
                             <input type="text" id="metaTemplateName" placeholder="promo_januari" class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 shadow-sm transition-colors">
                         </div>
                     </div>
+                    
+                    <!-- Meta Template B for A/B Testing -->
+                    <div id="metaApiConfigB" class="hidden relative z-10 mt-2">
+                        <label class="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mb-1">🔀 Nama Template B (Untuk A/B Testing)</label>
+                        <input type="text" id="metaTemplateNameB" placeholder="promo_januari_alt" class="w-full border-indigo-300 dark:border-indigo-700/50 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 text-slate-800 dark:text-white p-2 text-xs focus:ring-indigo-500 shadow-sm transition-colors">
+                    </div>
+
                     <div class="relative z-10 pt-2 border-t border-emerald-200/50 dark:border-emerald-800/50 mt-2">
                         <label class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">🔘 Parameter Tombol Dinamis (Opsional)</label>
                         <input type="text" id="metaButtonParam" placeholder="Isi variabel tombol (misal: {resi})" class="w-full border-emerald-300 dark:border-emerald-700/50 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-2 text-xs focus:ring-emerald-500 shadow-sm transition-colors font-mono">
@@ -279,37 +402,49 @@
                 </h3>
                 
                 <div class="space-y-4">
-                    <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3">
                         <div class="flex-1">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Zero-Width Hash Breaker</label>
-                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Menyisipkan karakter transparan untuk memanipulasi & memecah pola Hash ID pada server Meta.</p>
+                            <label for="useZeroWidth" class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block cursor-pointer">Zero-Width Hash Breaker</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Menyisipkan karakter transparan untuk memanipulasi pola Hash ID server.</p>
                         </div>
-                        <div class="relative inline-block w-10 flex-shrink-0 align-middle select-none transition duration-200 ease-in mt-0.5">
-                            <input type="checkbox" id="useZeroWidth" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                            <label for="useZeroWidth" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors"></label>
-                        </div>
+                        <label for="useZeroWidth" class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                          <input type="checkbox" id="useZeroWidth" checked class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600 transition-colors"></div>
+                        </label>
                     </div>
                     
-                    <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3">
                         <div class="flex-1">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Typing Speed Simulator</label>
-                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Tambahkan ekstra delay otomatis berdasarkan jumlah karakter untuk meniru durasi ketikan manusia asli.</p>
+                            <label for="useTypingSpeed" class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block cursor-pointer">Typing Speed Simulator</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Tambahkan ekstra delay otomatis berdasarkan jumlah karakter.</p>
                         </div>
-                        <div class="relative inline-block w-10 flex-shrink-0 align-middle select-none transition duration-200 ease-in mt-0.5">
-                            <input type="checkbox" id="useTypingSpeed" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                            <label for="useTypingSpeed" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors"></label>
-                        </div>
+                        <label for="useTypingSpeed" class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                          <input type="checkbox" id="useTypingSpeed" checked class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600 transition-colors"></div>
+                        </label>
                     </div>
                     
-                    <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3">
                         <div class="flex-1">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block">Mode Pemanasan (Warm-up)</label>
-                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Melipatgandakan (x2) durasi delay pada 20 antrean pertama agar aman untuk nomor WhatsApp baru.</p>
+                            <label for="useWarmup" class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block cursor-pointer">Mode Pemanasan (Warm-up)</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Melipatgandakan (x2) delay pada 20 antrean pertama.</p>
                         </div>
-                        <div class="relative inline-block w-10 flex-shrink-0 align-middle select-none transition duration-200 ease-in mt-0.5">
-                            <input type="checkbox" id="useWarmup" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                            <label for="useWarmup" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors"></label>
+                        <label for="useWarmup" class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                          <input type="checkbox" id="useWarmup" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600 transition-colors"></div>
+                        </label>
+                    </div>
+
+                    <!-- SMART TIMEZONE GUARD -->
+                    <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <div class="flex-1">
+                            <label for="useSmartTimezone" class="text-xs font-bold text-amber-600 dark:text-amber-500 transition-colors block cursor-pointer">Smart Timezone (WITA/WIT Guard)</label>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Melindungi pengiriman malam hari ke pelanggan di Indonesia Timur (otomatis +2 Jam offset).</p>
                         </div>
+                        <label for="useSmartTimezone" class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                          <input type="checkbox" id="useSmartTimezone" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500 transition-colors"></div>
+                        </label>
                     </div>
                 </div>
 
@@ -395,9 +530,16 @@
                 </div>
             </div>
 
-            <!-- Toolbar Grouping -->
+            <!-- Toolbar Global (Kanan Atas) -->
             <div class="flex items-center gap-2 sm:gap-3">
                 
+                <button onclick="openReport()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 rounded-lg transition-all shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Laporan Grafis
+                </button>
+
+                <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
                 <!-- Theme Toggle -->
                 <button onclick="toggleTheme()" class="p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-full transition-colors focus:outline-none" title="Ganti Tema Visual">
                     <svg id="themeIconLight" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -407,11 +549,11 @@
                 <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
                 <!-- Account Badge -->
-                <div id="userProfileBadge" class="hidden items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-lg">
-                    <div class="w-6 h-6 rounded-full bg-indigo-200 dark:bg-indigo-700 flex items-center justify-center text-indigo-700 dark:text-indigo-200 text-[10px] font-bold" id="userInitial">A</div>
+                <div id="userProfileBadge" class="hidden items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-lg">
+                    <div class="w-6 h-6 rounded-full bg-emerald-200 dark:bg-emerald-700 flex items-center justify-center text-emerald-700 dark:text-emerald-200 text-[10px] font-bold" id="userInitial">A</div>
                     <div class="hidden md:block">
-                        <p class="text-[10px] font-bold text-indigo-900 dark:text-indigo-200 leading-tight" id="userNameDisplay">Admin</p>
-                        <p class="text-[8px] text-indigo-500 dark:text-indigo-400 leading-tight">Administrator</p>
+                        <p class="text-[10px] font-bold text-emerald-900 dark:text-emerald-200 leading-tight" id="userNameDisplay">Admin</p>
+                        <p class="text-[8px] text-emerald-500 dark:text-emerald-400 leading-tight">Administrator</p>
                     </div>
                 </div>
 
@@ -421,31 +563,6 @@
                 <button id="btnRecover" onclick="recoverSession()" class="hidden bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-md shadow-sm font-bold transition flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     <span class="hidden sm:inline">Pulihkan Crash</span>
-                </button>
-
-                <!-- Segmented Control Toolbar (Export & Import) -->
-                <div class="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700/80 transition-colors">
-                    
-                    <button onclick="exportCSV()" id="btnExport" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white rounded-md transition-all disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed" disabled title="Download Laporan">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <span class="hidden md:inline">Export</span>
-                    </button>
-                    
-                    <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                    
-                    <div class="relative">
-                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
-                        <button onclick="document.getElementById('csvFileInput').click()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-teal-600 dark:hover:text-teal-400 rounded-md transition-all" title="Upload Database Lokal">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            <span class="hidden md:inline">Import CSV</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Primary Call-to-Action (Sinkronisasi Sheet) -->
-                <button onclick="fetchDataFromSheet()" id="btnLoad" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-md shadow-indigo-600/20 transition-all border border-indigo-500 hover:border-indigo-600">
-                    <svg id="loadIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    <span class="hidden sm:inline">Sinkronisasi</span>
                 </button>
             </div>
         </header>
@@ -510,27 +627,70 @@
                 
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-[500px] transition-colors duration-300">
-                <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-xl transition-colors duration-300">
+            <!-- TABEL ANTARA DATA & MANAJEMEN -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-[600px] transition-colors duration-300">
+                
+                <!-- TIER 1: DATA MANAGEMENT TOOLBAR -->
+                <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50 dark:bg-slate-900/80 rounded-t-xl transition-colors duration-300">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-slate-700 dark:text-slate-200 text-sm">Daftar Antrean</h3>
+                        <span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] px-2 py-0.5 rounded-full font-bold border border-indigo-200 dark:border-indigo-800" id="badgeTotalData">0 Kontak</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-end">
+                        <!-- Sinkronisasi Button -->
+                        <button onclick="fetchDataFromSheet()" id="btnLoad" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all border border-indigo-500 hover:border-indigo-600">
+                            <svg id="loadIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Sinkronisasi
+                        </button>
+
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                        <!-- Import CSV Button -->
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                        <button onclick="document.getElementById('csvFileInput').click()" class="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all" title="Upload Database Lokal">
+                            <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            Import CSV
+                        </button>
+
+                        <!-- Paste Manual Button -->
+                        <button onclick="openManualInput()" class="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all" title="Paste Nomor Manual">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            Paste Manual
+                        </button>
+
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                        <!-- Export Button -->
+                        <button onclick="exportCSV()" id="btnExport" disabled class="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:bg-transparent disabled:cursor-not-allowed" title="Download Laporan">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TIER 2: PENCARIAN & VARIABEL (Tools) -->
+                <div class="p-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between gap-4 bg-slate-50/30 dark:bg-slate-900/30 transition-colors duration-300">
                     <div class="flex-1 max-w-sm">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-4 w-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </div>
-                            <input type="text" id="searchInput" onkeyup="applyFilter()" placeholder="Filter nama, status..." class="block w-full pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" disabled>
+                            <input type="text" id="searchInput" onkeyup="applyFilter()" placeholder="Pencarian cepat..." class="block w-full pl-10 pr-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" disabled>
                         </div>
                     </div>
                     <div class="flex-1 flex flex-col justify-center">
-                        <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Klik untuk sisipkan variabel:</p>
+                        <p class="text-[9px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Klik untuk sisipkan variabel ke Teks Utama:</p>
                         <div id="variableChips" class="flex gap-1.5 overflow-x-auto scrollbar-hide"></div>
                     </div>
                 </div>
                 
+                <!-- LIST DATA -->
                 <div id="statusList" class="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50/30 dark:bg-slate-950/30 dark-scroll">
                     <div class="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
                         <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                         <p class="font-medium">Ruang kerja masih kosong.</p>
-                        <p class="text-xs mt-1">Sinkronisasi Sheet atau Import CSV untuk memulai.</p>
+                        <p class="text-xs mt-1 text-center">Gunakan tombol <b>Sinkronisasi</b>, <b>Import CSV</b>, atau <b>Paste Manual</b><br> di atas untuk memuat data target.</p>
                     </div>
                 </div>
             </div>
@@ -642,8 +802,9 @@
         let countdownTimer = null;
         let batchSendCounter = 0; 
         
-        let statsTrack = { pending: 0, sent: 0, failed: 0, health: 100 };
+        let statsTrack = { pending: 0, sent: 0, failed: 0, health: 100, sentA: 0, sentB: 0 };
         let donutChart = null;
+        let barChart = null;
         let consecutiveMetaErrors = 0; 
 
         const LS_CAMPAIGN_KEY = 'wa_sec_campaigns_v9';
@@ -675,6 +836,251 @@
             
             updateBlacklistCount();
         });
+
+        // ==========================================
+        // FITUR ONE-CLICK CLOUD UPLOADER
+        // ==========================================
+        async function handleMediaUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 50 * 1024 * 1024) {
+                Swal.fire('Ukuran Melebihi Batas', 'Maksimal ukuran file adalah 50MB.', 'warning');
+                event.target.value = '';
+                return;
+            }
+
+            Swal.fire({
+                title: 'Mengunggah File...',
+                html: 'Mempersiapkan media untuk pengiriman API...<br><br><span class="text-xs text-slate-500">Mungkin memakan waktu beberapa detik.</span>',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            const formData = new FormData();
+            formData.append('reqtype', 'fileupload');
+            formData.append('fileToUpload', file);
+
+            try {
+                // Uploading to Free Public CDN (Catbox.moe)
+                const response = await fetch('https://catbox.moe/user/api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const fileUrl = await response.text();
+                
+                if (fileUrl && fileUrl.startsWith('http')) {
+                    document.getElementById('mediaUrl').value = fileUrl.trim();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Unggah Berhasil',
+                        text: 'URL Lampiran telah berhasil dibuat dan siap dikirim!',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    throw new Error("Respon API tidak valid.");
+                }
+            } catch (error) {
+                console.error('Upload Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Gagal',
+                    text: 'Gagal mengunggah file ke Cloud CDN. Server mungkin sedang sibuk atau browser Anda memblokir akses CORS. Silakan masukkan URL eksternal secara manual.',
+                    confirmButtonColor: '#059669'
+                });
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        // ==========================================
+        // FITUR 1: MAGIC SPINTAX GENERATOR
+        // ==========================================
+        function applyMagicSpintax() {
+            let msg = document.getElementById('message').value;
+            if(!msg) return Swal.fire('Teks Kosong', 'Ketikkan pesan promosi Anda terlebih dahulu.', 'info');
+            
+            Swal.fire({
+                title: 'Magic Spintax',
+                text: 'Menerapkan variasi kata otomatis untuk menekan Spam Score...',
+                timer: 800,
+                showConfirmButton: false
+            }).then(() => {
+                const dict = [
+                    { regex: /\b(halo|hai)\b/gi, replacement: "{Halo|Hai|Salam|Selamat datang}" },
+                    { regex: /\b(diskon|potongan)\b/gi, replacement: "{diskon|potongan harga|cashback|penawaran spesial}" },
+                    { regex: /\b(murah|terjangkau)\b/gi, replacement: "{murah|sangat terjangkau|hemat|ekonomis}" },
+                    { regex: /\b(beli|pesan)\b/gi, replacement: "{beli|pesan|order|dapatkan|miliki}" },
+                    { regex: /\b(sekarang|hari ini)\b/gi, replacement: "{sekarang|hari ini juga|segera|saat ini juga}" },
+                    { regex: /\b(terima kasih|makasih)\b/gi, replacement: "{terima kasih|thank you|trims}" },
+                    { regex: /\b(info|informasi)\b/gi, replacement: "{info|informasi|detail|keterangan}" }
+                ];
+                
+                let newMsg = msg;
+                dict.forEach(rule => {
+                    newMsg = newMsg.replace(rule.regex, (match, p1, offset, string) => {
+                        let isInBraces = false;
+                        let leftStr = string.substring(0, offset);
+                        let openBraces = (leftStr.match(/\{/g) || []).length;
+                        let closeBraces = (leftStr.match(/\}/g) || []).length;
+                        if(openBraces > closeBraces) isInBraces = true;
+                        
+                        return isInBraces ? match : rule.replacement;
+                    });
+                });
+                
+                document.getElementById('message').value = newMsg;
+                analyzeSpamScore();
+            });
+        }
+
+        // ==========================================
+        // FITUR 4: A/B SPLIT TESTING TOGGLE
+        // ==========================================
+        function toggleABTest() {
+            const isChecked = document.getElementById('abTestToggle').checked;
+            const containerB = document.getElementById('abTestContainer');
+            const metaB = document.getElementById('metaApiConfigB');
+            
+            if(isChecked) {
+                containerB.classList.remove('hidden');
+                metaB.classList.remove('hidden');
+            } else {
+                containerB.classList.add('hidden');
+                metaB.classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        // FITUR 3: EXECUTIVE GRAPHICAL REPORT
+        // ==========================================
+        function openReport() {
+            if(filteredData.length === 0) return Swal.fire('Data Kosong', 'Tidak ada data kampanye untuk dilaporkan.', 'info');
+            
+            document.getElementById('reportModal').classList.remove('hidden');
+            document.getElementById('reportDate').innerText = `Dicetak pada: ${new Date().toLocaleString('id-ID')}`;
+            
+            document.getElementById('repTotal').innerText = filteredData.length;
+            document.getElementById('repSent').innerText = statsTrack.sent;
+            document.getElementById('repFailed').innerText = statsTrack.failed;
+            let rate = filteredData.length > 0 ? Math.round((statsTrack.sent / (statsTrack.sent + statsTrack.failed || 1)) * 100) : 0;
+            document.getElementById('repRate').innerText = `${rate}%`;
+
+            const abUI = document.getElementById('abTestReportUI');
+            const isAB = document.getElementById('abTestToggle').checked;
+            if(isAB && (statsTrack.sentA > 0 || statsTrack.sentB > 0)) {
+                let totalA = Math.ceil(filteredData.length / 2);
+                let totalB = Math.floor(filteredData.length / 2);
+                let rateA = Math.round((statsTrack.sentA / (totalA||1)) * 100);
+                let rateB = Math.round((statsTrack.sentB / (totalB||1)) * 100);
+                
+                abUI.innerHTML = `
+                    <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-700">
+                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Template A</span>
+                        <span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${statsTrack.sentA} Terkirim (${rateA}%)</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-700 mt-2">
+                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Template B</span>
+                        <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">${statsTrack.sentB} Terkirim (${rateB}%)</span>
+                    </div>
+                `;
+            } else {
+                abUI.innerHTML = `<p class="text-center text-xs text-slate-400 italic">A/B Testing tidak diaktifkan pada sesi ini.</p>`;
+            }
+
+            const ctx = document.getElementById('barChartCanvas').getContext('2d');
+            if(barChart) barChart.destroy();
+            
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Terkirim', 'Gagal/Invalid'],
+                    datasets: [{
+                        label: 'Distribusi Status',
+                        data: [statsTrack.sent, statsTrack.failed],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        function closeReport() {
+            document.getElementById('reportModal').classList.add('hidden');
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // ==========================================
+        // MANUAL INPUT (PASTE NUMBERS) LOGIC
+        // ==========================================
+        function openManualInput() {
+            document.getElementById('manualInputModal').classList.remove('hidden');
+        }
+
+        function closeManualInput() {
+            document.getElementById('manualInputModal').classList.add('hidden');
+            document.getElementById('manualInputText').value = '';
+        }
+
+        function processManualInput() {
+            const rawText = document.getElementById('manualInputText').value;
+            if (!rawText.trim()) {
+                return Swal.fire('Data Kosong', 'Silakan paste nomor WhatsApp target.', 'warning');
+            }
+
+            const lines = rawText.split(/\r\n|\n/).filter(line => line.trim() !== '');
+            const parsedData = [];
+
+            lines.forEach((line, idx) => {
+                let targetNum = line.trim();
+                let targetName = "";
+                
+                if(line.includes(';')) {
+                    const parts = line.split(';');
+                    targetNum = parts[0].trim();
+                    targetName = parts[1] ? parts[1].trim() : "";
+                } else if(line.includes('\t')) {
+                    const parts = line.split('\t');
+                    targetNum = parts[0].trim();
+                    targetName = parts[1] ? parts[1].trim() : "";
+                } else if(line.includes(',')) {
+                    const parts = line.split(',');
+                    targetNum = parts[0].trim();
+                    targetName = parts[1] ? parts[1].trim() : "";
+                }
+
+                parsedData.push({
+                    _rowIdx: idx + 2, 
+                    no: targetNum,
+                    nama: targetName
+                });
+            });
+
+            if (parsedData.length === 0) {
+                return Swal.fire('Format Salah', 'Tidak ada baris data yang valid ditemukan.', 'error');
+            }
+
+            document.getElementById('statusList').innerHTML = '<div class="text-center mt-14"><p class="text-indigo-600 dark:text-indigo-400 text-sm animate-pulse font-semibold">Memproses Input Manual...</p></div>';
+            
+            setTimeout(() => {
+                handleDataSuccess(parsedData, "Paste Manual");
+                closeManualInput();
+            }, 300);
+        }
 
         // ==========================================
         // AUTO-SYNC META CREDENTIALS TO ADMIN BACKEND
@@ -738,8 +1144,22 @@
 
         function updateBlacklistCount() {
             const bl = SecureStore.get('wa_blacklist') || [];
+            const dc = SecureStore.get('wa_dead_cache') || [];
             const el = document.getElementById('blacklistCount');
-            if(el) el.innerText = `Total Terdaftar: ${bl.length} Nomor`;
+            if(el) el.innerText = `Terdaftar: ${bl.length} Blacklist | ${dc.length} Dead-Cache`;
+        }
+
+        function clearDeadCache() {
+            Swal.fire({
+                title: 'Bersihkan Invalid Cache?', text: "Ini akan menghapus memori nomor-nomor yang sebelumnya gagal terkirim.", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Bersihkan'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    SecureStore.remove('wa_dead_cache');
+                    updateBlacklistCount();
+                    Swal.fire('Dibersihkan!', 'Auto-cache nomor invalid telah dikosongkan.', 'success');
+                }
+            });
         }
 
         // ==========================================
@@ -1100,19 +1520,15 @@
             reader.readAsText(file);
         }
 
-        // ==========================================
-        // SMART CSV PARSER (Menangani Koma dalam Kutip)
-        // ==========================================
         function processCSVData(csvText, sourceName = "CSV") {
             const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
             if (lines.length < 2) return Swal.fire('Data Kosong', 'Data kosong atau tidak memiliki header.', 'warning');
 
-            // Parser khusus untuk menangani CSV yang field-nya di-wrap tanda kutip
             function parseCSVRow(str) {
                 let result = [], inQuotes = false, current = '';
                 for (let i = 0; i < str.length; i++) {
                     let char = str[i];
-                    if (char === '"' && str[i+1] === '"') { current += '"'; i++; } // Escaped quote
+                    if (char === '"' && str[i+1] === '"') { current += '"'; i++; } 
                     else if (char === '"') { inQuotes = !inQuotes; }
                     else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
                     else { current += char; }
@@ -1146,6 +1562,11 @@
             localStorage.setItem('wa_theme', isDark ? 'dark' : 'light');
             updateThemeIconsUI(isDark);
             if(donutChart) { donutChart.data.datasets[0].backgroundColor[0] = isDark ? '#334155' : '#e2e8f0'; donutChart.update(); }
+            if(barChart) {
+                barChart.options.scales.x.ticks.color = isDark ? '#94a3b8' : '#64748b';
+                barChart.options.scales.y.ticks.color = isDark ? '#94a3b8' : '#64748b';
+                barChart.update();
+            }
         }
 
         function updateThemeIconsUI(isDark) {
@@ -1153,12 +1574,28 @@
             document.getElementById('themeIconLight').classList.toggle('hidden', !isDark);
         }
 
-        function isOutsideWorkingHours() {
+        function isOutsideWorkingHours(userNumberStr = "") {
             const start = document.getElementById('workStart').value;
             const end = document.getElementById('workEnd').value;
             if(!start || !end) return false;
+            
             const now = new Date();
-            const currentStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            let hours = now.getHours();
+            
+            const useTimezoneGuard = document.getElementById('useSmartTimezone') && document.getElementById('useSmartTimezone').checked;
+            
+            if(useTimezoneGuard && userNumberStr) {
+                const easternPrefixes = ['628214', '628224', '628124', '628524', '628534', '628234', '628114'];
+                let isEastern = easternPrefixes.some(prefix => userNumberStr.startsWith(prefix));
+                
+                if(isEastern) {
+                    hours += 2;
+                    if(hours >= 24) hours -= 24;
+                }
+            }
+
+            const currentStr = hours.toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
             if (start <= end) return currentStr < start || currentStr >= end;
             else return currentStr >= end && currentStr < start;
         }
@@ -1182,6 +1619,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         rawData = session.data; filteredData = session.data; currentIndex = session.idx; statsTrack = session.stats;
+                        if(statsTrack.sentA === undefined) { statsTrack.sentA = 0; statsTrack.sentB = 0; }
                         
                         availableVariables = Object.keys(filteredData[0]).filter(k => k !== '_rowIdx' && k !== '_status_ui' && k !== '_rawNo');
                         renderVariableChips(); renderDataPreview(); updateStatsUI(); updateHealthUI();
@@ -1234,15 +1672,22 @@
             document.getElementById('maxDelay').value = prof.maxDelay || 45;
             document.getElementById('batchSize').value = prof.batchSize || 50;
             document.getElementById('restTime').value = prof.restTime || 10;
-            document.getElementById('useZeroWidth').checked = prof.useZeroWidth !== false; 
-            document.getElementById('useTypingSpeed').checked = prof.useTypingSpeed !== false;
-            document.getElementById('useWarmup').checked = prof.useWarmup || false;
+            
+            if (document.getElementById('useZeroWidth')) document.getElementById('useZeroWidth').checked = prof.useZeroWidth !== false; 
+            if (document.getElementById('useTypingSpeed')) document.getElementById('useTypingSpeed').checked = prof.useTypingSpeed !== false;
+            if (document.getElementById('useWarmup')) document.getElementById('useWarmup').checked = prof.useWarmup || false;
+            if (document.getElementById('useSmartTimezone')) document.getElementById('useSmartTimezone').checked = prof.useSmartTimezone || false;
+
             document.getElementById('workStart').value = prof.workStart || '07:00';
             document.getElementById('workEnd').value = prof.workEnd || '22:00';
             document.getElementById('interventionLimit').value = prof.interventionLimit || 40;
             
-            if(prof.metaButtonParam !== undefined) {
-                document.getElementById('metaButtonParam').value = prof.metaButtonParam;
+            if(prof.metaButtonParam !== undefined) document.getElementById('metaButtonParam').value = prof.metaButtonParam;
+            if(prof.messageB !== undefined) document.getElementById('messageB').value = prof.messageB;
+            if(prof.metaTemplateB !== undefined) document.getElementById('metaTemplateNameB').value = prof.metaTemplateB;
+            if(prof.useAB !== undefined) {
+                document.getElementById('abTestToggle').checked = prof.useAB;
+                toggleABTest();
             }
             
             analyzeSpamScore(); 
@@ -1251,28 +1696,34 @@
             const msg = document.getElementById('message').value.trim();
             if (!msg) return Swal.fire('Teks Kosong', 'Silakan isi pesan utama terlebih dahulu.', 'warning');
             
-            const profileName = prompt("Nama Profil Kampanye Workspace:", "Workspace Baru");
+            const profileName = prompt("Nama Kampanye (Contoh: Promo Pagi):", "Kampanye Baru");
             if (profileName && profileName.trim()) {
                 campaignProfiles[profileName.trim()] = {
                     msg: msg, url: document.getElementById('mediaUrl').value.trim(),
                     fallback: document.getElementById('fallbackName').value.trim(),
                     minDelay: document.getElementById('minDelay').value, maxDelay: document.getElementById('maxDelay').value,
                     batchSize: document.getElementById('batchSize').value, restTime: document.getElementById('restTime').value,
-                    useZeroWidth: document.getElementById('useZeroWidth').checked, useTypingSpeed: document.getElementById('useTypingSpeed').checked,
-                    useWarmup: document.getElementById('useWarmup').checked, workStart: document.getElementById('workStart').value,
+                    useZeroWidth: document.getElementById('useZeroWidth') ? document.getElementById('useZeroWidth').checked : true, 
+                    useTypingSpeed: document.getElementById('useTypingSpeed') ? document.getElementById('useTypingSpeed').checked : true,
+                    useWarmup: document.getElementById('useWarmup') ? document.getElementById('useWarmup').checked : false, 
+                    useSmartTimezone: document.getElementById('useSmartTimezone') ? document.getElementById('useSmartTimezone').checked : false,
+                    workStart: document.getElementById('workStart').value,
                     workEnd: document.getElementById('workEnd').value, interventionLimit: document.getElementById('interventionLimit').value,
-                    metaButtonParam: document.getElementById('metaButtonParam').value.trim()
+                    metaButtonParam: document.getElementById('metaButtonParam').value.trim(),
+                    useAB: document.getElementById('abTestToggle').checked,
+                    messageB: document.getElementById('messageB').value.trim(),
+                    metaTemplateB: document.getElementById('metaTemplateNameB').value.trim()
                 };
                 SecureStore.set(LS_CAMPAIGN_KEY, campaignProfiles);
                 updateCampaignDropdown(); document.getElementById('campaignSelect').value = profileName.trim();
-                Swal.fire('Tersimpan', `Profil "${profileName.trim()}" berhasil dienkripsi dan disimpan.`, 'success');
+                Swal.fire('Tersimpan', `Kampanye "${profileName.trim()}" berhasil dienkripsi dan disimpan.`, 'success');
             }
         }
         function deleteCampaignProfile() {
             const key = document.getElementById('campaignSelect').value;
             if (!key) return;
             Swal.fire({
-                title: 'Hapus Profil?', text: `Hapus permanen profil "${key}"?`, icon: 'warning',
+                title: 'Hapus Kampanye?', text: `Hapus permanen kampanye "${key}"?`, icon: 'warning',
                 showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -1314,7 +1765,6 @@
 
             try {
                 if (userApi.includes('script.google.com')) {
-                    // METODE LAMA: Apps Script Web App
                     const response = await fetch(userApi, {
                         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: 'getContacts' })
@@ -1328,7 +1778,6 @@
                         throw new Error(result.message || "Gagal memuat data dari server Web App.");
                     }
                 } else if (userApi.includes('docs.google.com/spreadsheets')) {
-                    // METODE BARU: Direct Google Sheet Link (Gviz CSV)
                     const sheetIdMatch = userApi.match(/\/d\/([a-zA-Z0-9-_]+)/);
                     if (!sheetIdMatch) throw new Error("Link Google Sheets tidak valid. Pastikan link di-copy dengan benar.");
                     const sheetId = sheetIdMatch[1];
@@ -1383,6 +1832,8 @@
             
             const uniqueData = [];
             const seenNumbers = new Set();
+            
+            const deadCache = SecureStore.get('wa_dead_cache') || [];
 
             data.forEach(item => {
                 let noKey = Object.keys(item).find(k => k.toLowerCase() === 'no' || k.toLowerCase().includes('nomor') || k.toLowerCase() === 'hp' || k.toLowerCase() === 'phone' || k.toLowerCase() === 'telepon');
@@ -1396,7 +1847,14 @@
                 } else {
                     processedItem.no = sanitizeResult.clean;
                     if (!seenNumbers.has(processedItem.no)) {
-                        seenNumbers.add(processedItem.no); processedItem._status_ui = 'Siap';
+                        seenNumbers.add(processedItem.no); 
+                        
+                        if(deadCache.includes(processedItem.no)) {
+                            processedItem._status_ui = 'Invalid (Auto-Cache)';
+                        } else {
+                            processedItem._status_ui = 'Siap';
+                        }
+                        
                         uniqueData.push(processedItem);
                     }
                 }
@@ -1405,6 +1863,7 @@
             rawData = uniqueData;
             if(rawData.length === 0) {
                 document.getElementById('statusList').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-sm text-center mt-10">Data kosong/tidak valid.</p>';
+                document.getElementById('badgeTotalData').innerText = '0 Kontak';
                 return;
             }
 
@@ -1437,9 +1896,9 @@
             filteredData = rawData.filter(item => Object.values(item).join(' ').toLowerCase().includes(keyword));
 
             const tempHealth = statsTrack.health;
-            statsTrack = { pending: filteredData.length, sent: 0, failed: 0, health: tempHealth };
+            statsTrack = { pending: filteredData.length, sent: 0, failed: 0, health: tempHealth, sentA: 0, sentB: 0 };
             
-            filteredData.forEach(item => { if (item._status_ui === 'Format Invalid') { statsTrack.failed++; statsTrack.pending--; } });
+            filteredData.forEach(item => { if (item._status_ui === 'Format Invalid' || item._status_ui === 'Invalid (Auto-Cache)') { statsTrack.failed++; statsTrack.pending--; } });
 
             currentIndex = 0; updateStatsUI(); renderDataPreview();
             
@@ -1464,9 +1923,9 @@
                 
                 let pillClass = "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700";
                 
-                if(user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal') {
+                if(user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Invalid (Auto-Cache)') {
                     pillClass = "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800";
-                } else if(user._status_ui === 'Terkirim') {
+                } else if(user._status_ui.includes('Terkirim')) {
                     pillClass = "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
                 } else if(user._status_ui === 'Diabaikan (Blacklist)') {
                     pillClass = "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
@@ -1475,6 +1934,7 @@
                 let sourceBadge = "";
                 if(user._source === 'CSV') sourceBadge = `<span class="bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-teal-200 dark:border-teal-800">CSV</span>`;
                 else if(user._source === 'GSheets Direct') sourceBadge = `<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-green-200 dark:border-green-800">GSheets</span>`;
+                else if(user._source === 'Paste Manual') sourceBadge = `<span class="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-amber-200 dark:border-amber-800">Manual</span>`;
                 else sourceBadge = `<span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[8px] px-1.5 py-0.5 rounded ml-1 border border-indigo-200 dark:border-indigo-800">API</span>`;
 
                 log.className = "flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition cursor-pointer group";
@@ -1578,6 +2038,10 @@
             document.getElementById('statSent').innerText = statsTrack.sent;
             document.getElementById('statFailed').innerText = statsTrack.failed;
             document.getElementById('queueCount').innerText = filteredData.length;
+            
+            const badgeTotal = document.getElementById('badgeTotalData');
+            if(badgeTotal) badgeTotal.innerText = filteredData.length + ' Kontak';
+
             if (donutChart) {
                 statsTrack.pending = Math.max(0, filteredData.length - (statsTrack.sent + statsTrack.failed));
                 donutChart.data.datasets[0].data = [statsTrack.pending, statsTrack.sent, statsTrack.failed];
@@ -1676,17 +2140,26 @@
             return processed;
         }
 
-        function setRowStatus(index, text, isSuccess) {
+        function setRowStatus(index, text, isSuccess, isVarB = false) {
             const pill = document.getElementById(`stat-${index}`); const card = document.getElementById(`row-item-${index}`);
             if (isSuccess === true) { 
                 pill.className = "status-pill bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"; 
-                statsTrack.sent++; filteredData[index]._status_ui = 'Terkirim'; 
+                statsTrack.sent++; 
+                if(isVarB) statsTrack.sentB++; else statsTrack.sentA++;
+                filteredData[index]._status_ui = text; 
                 updateHealthScore(-0.5); 
             } 
             else if (isSuccess === false) { 
                 pill.className = "status-pill bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"; 
                 statsTrack.failed++; filteredData[index]._status_ui = 'Gagal'; 
                 updateHealthScore(-5); 
+                
+                const deadCache = SecureStore.get('wa_dead_cache') || [];
+                const userNo = filteredData[index].no;
+                if(!deadCache.includes(userNo)) {
+                    deadCache.push(userNo);
+                    SecureStore.set('wa_dead_cache', deadCache);
+                }
             } 
             else if (isSuccess === 'skip') {
                 pill.className = "status-pill bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
@@ -1760,14 +2233,18 @@
             const userApi = document.getElementById('userApiUrl').value.trim();
             const sendMode = document.getElementById('sendMode').value;
             
-            const msgTemplateRaw = document.getElementById('message').value;
+            const msgTemplateRawA = document.getElementById('message').value;
             const mediaUrlRaw = document.getElementById('mediaUrl').value.trim();
             const fallbackStr = document.getElementById('fallbackName').value || "";
             
-            // Meta API Credentials
+            // A/B Testing Prep
+            const useABTesting = document.getElementById('abTestToggle').checked;
+            const msgTemplateRawB = document.getElementById('messageB').value;
+            const metaTemplateNameA = document.getElementById('metaTemplateName').value.trim();
+            const metaTemplateNameB = document.getElementById('metaTemplateNameB').value.trim();
+
             const metaToken = document.getElementById('metaToken').value.trim();
             const metaPhoneId = document.getElementById('metaPhoneId').value.trim();
-            const metaTemplateName = document.getElementById('metaTemplateName').value.trim();
             const metaBtnParamRaw = document.getElementById('metaButtonParam').value.trim();
             
             // Mengambil data Blacklist dari SecureStore
@@ -1776,9 +2253,11 @@
             for (; currentIndex < filteredData.length; currentIndex++) {
                 updateETA(filteredData.length - currentIndex);
                 
-                while (isOutsideWorkingHours() && !stopRequested) {
+                const user = filteredData[currentIndex];
+                
+                while (isOutsideWorkingHours(user.no) && !stopRequested) {
                     updateBadge("ZzZ DILUAR JAM KERJA", "bg-slate-600");
-                    if(!document.getElementById('temp-delay')) createDelayLog(currentIndex, `⏰ Sistem tidur. Menunggu Jam Operasional...`);
+                    if(!document.getElementById('temp-delay')) createDelayLog(currentIndex, `⏰ Guard Area/Tidur. Menunggu jam kerja...`);
                     await new Promise(r => setTimeout(r, 60000)); 
                 }
 
@@ -1786,8 +2265,7 @@
                 while (isPaused && !stopRequested) await new Promise(r => setTimeout(r, 500)); 
                 if (stopRequested) break;
 
-                const user = filteredData[currentIndex];
-                if(user._status_ui === 'Terkirim' || user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Diabaikan (Blacklist)') continue;
+                if(user._status_ui.includes('Terkirim') || user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Invalid (Auto-Cache)' || user._status_ui === 'Diabaikan (Blacklist)') continue;
 
                 // Cek Blacklist (Opt-out) System
                 if(blacklistDB.includes(user.no)) {
@@ -1798,6 +2276,10 @@
                 setRowStatus(currentIndex, "Memproses", null);
                 
                 let isSendSuccess = false;
+                
+                let isVariantB = useABTesting && (currentIndex % 2 !== 0);
+                let currentMsgTemplate = isVariantB && msgTemplateRawB ? msgTemplateRawB : msgTemplateRawA;
+                let currentMetaTemplate = isVariantB && metaTemplateNameB ? metaTemplateNameB : metaTemplateNameA;
 
                 // 1. MEMBUAT LAMPIRAN DINAMIS (Berdasarkan variabel user)
                 let finalMediaUrl = "";
@@ -1807,7 +2289,7 @@
 
                 // 2. LOGIKA PENGIRIMAN
                 if (sendMode === 'wa_web') {
-                    let finalMsg = processMessage(msgTemplateRaw, user, true);
+                    let finalMsg = processMessage(currentMsgTemplate, user, true);
                     
                     // Injeksi URL Lampiran ke Teks jika WA Web
                     if (finalMediaUrl) finalMsg += `\n\n📄 *Dokumen Lampiran:*\n${finalMediaUrl}`;
@@ -1833,7 +2315,7 @@
                         }
 
                         // B. SMART VARIABLE PARSER (Untuk Body)
-                        const matches = msgTemplateRaw.match(/\{([^{}]+)\}/g) || [];
+                        const matches = currentMsgTemplate.match(/\{([^{}]+)\}/g) || [];
                         let bodyParams = [];
                         
                         matches.forEach(m => {
@@ -1868,7 +2350,7 @@
                             to: user.no,
                             type: "template",
                             template: {
-                                name: metaTemplateName,
+                                name: currentMetaTemplate,
                                 language: { code: "id" },
                                 components: componentsArray
                             }
@@ -1894,20 +2376,20 @@
                     }
                 }
 
-                setRowStatus(currentIndex, isSendSuccess ? "Terkirim" : "Gagal", isSendSuccess);
+                setRowStatus(currentIndex, isSendSuccess ? (isVariantB ? "Terkirim (Var B)" : "Terkirim (Var A)") : "Gagal", isSendSuccess, isVariantB);
                 
                 if (isSendSuccess) {
                     consecutiveMetaErrors = 0; // Reset error counter
                     batchSendCounter++;
                     if(batchSendCounter % 5 === 0) saveCurrentSession();
                     
-                    if (user._source !== 'CSV' && user._source !== 'GSheets Direct' && userApi !== '' && userApi.includes('script.google.com')) {
+                    if (user._source !== 'CSV' && user._source !== 'GSheets Direct' && user._source !== 'Paste Manual' && userApi !== '' && userApi.includes('script.google.com')) {
                         try {
-                            const finalStatusStr = (sendMode === 'meta_api') ? "Terkirim API - " : "Terkirim Web - ";
+                            const finalStatusStr = (sendMode === 'meta_api') ? "Terkirim API" : "Terkirim Web";
                             fetch(userApi, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                body: JSON.stringify({ action: 'updateStatus', rowIdx: user._rowIdx, status: finalStatusStr + new Date().toLocaleTimeString() })
+                                body: JSON.stringify({ action: 'updateStatus', rowIdx: user._rowIdx, status: finalStatusStr + " " + new Date().toLocaleTimeString() })
                             });
                         } catch(e) {}
                     }
@@ -1969,7 +2451,7 @@
 
                         let typingTextLog = "";
                         if(document.getElementById('useTypingSpeed').checked) {
-                            const msgLength = msgTemplateRaw.length || 50;
+                            const msgLength = currentMsgTemplate.length || 50;
                             const typingMs = msgLength * 40; 
                             delayMs += typingMs;
                             typingTextLog = `+ Ketik: ${Math.floor(typingMs/1000)}s`;
