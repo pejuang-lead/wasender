@@ -93,7 +93,7 @@
                 <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
                     <div id="nameField" class="hidden">
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
-                        <input type="text" id="authName" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="John Doe">
+                        <input type="text" id="authName" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white p-3 text-sm focus:ring-emerald-50 focus:border-emerald-500 transition-colors" placeholder="John Doe">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Email / Username</label>
@@ -912,6 +912,33 @@
                     clearCurrentSession(); // Hapus memori auto-recovery
                     
                     Swal.fire('Dibersihkan!', 'Antrean data telah dikosongkan.', 'success');
+                }
+            });
+        }
+        
+        // ==========================================
+        // INDIVIDUAL DELETE ROW
+        // ==========================================
+        function deleteRow(index, event) {
+            event.stopPropagation();
+            if (isSending) return Swal.fire('Sistem Berjalan', 'Jeda atau hentikan pengiriman untuk menghapus kontak.', 'warning');
+            
+            const user = filteredData[index];
+            const displayName = user.nama || user.name || user.no || "Tanpa Nama";
+            
+            Swal.fire({
+                title: 'Hapus Kontak?',
+                text: `Hapus ${displayName} dari antrean?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    rawData = rawData.filter(item => item !== user);
+                    applyFilter(); // Membangun ulang list dan memperbarui metrik secara akurat
                 }
             });
         }
@@ -1976,11 +2003,29 @@
             filteredData = rawData.filter(item => Object.values(item).join(' ').toLowerCase().includes(keyword));
 
             const tempHealth = statsTrack.health;
-            statsTrack = { pending: filteredData.length, sent: 0, failed: 0, health: tempHealth, sentA: 0, sentB: 0 };
+            let cSent = 0, cFailed = 0, cSentA = 0, cSentB = 0;
             
-            filteredData.forEach(item => { if (item._status_ui === 'Format Invalid' || item._status_ui === 'Invalid (Auto-Cache)') { statsTrack.failed++; statsTrack.pending--; } });
+            filteredData.forEach(item => { 
+                if (item._status_ui === 'Format Invalid' || item._status_ui === 'Gagal' || item._status_ui === 'Invalid (Auto-Cache)' || item._status_ui === 'Diabaikan (Blacklist)') { 
+                    cFailed++; 
+                } else if (item._status_ui.includes('Terkirim') || item._status_ui.includes('Dialihkan')) {
+                    cSent++;
+                    if(item._status_ui.includes('(A)')) cSentA++;
+                    if(item._status_ui.includes('(B)')) cSentB++;
+                }
+            });
 
-            currentIndex = 0; updateStatsUI(); renderDataPreview();
+            statsTrack = { 
+                pending: filteredData.length - cSent - cFailed, 
+                sent: cSent, 
+                failed: cFailed, 
+                health: tempHealth, 
+                sentA: cSentA, 
+                sentB: cSentB 
+            };
+
+            currentIndex = 0; 
+            updateStatsUI(); renderDataPreview();
             
             const btnStart = document.getElementById('btnStart');
             if (filteredData.length > 0) {
@@ -2028,13 +2073,20 @@
                 log.onclick = () => showLivePreview(i);
 
                 log.innerHTML = `
-                    <div class="flex flex-col max-w-[65%]">
+                    <div class="flex flex-col max-w-[60%]">
                         <span class="font-bold text-sm text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition truncate" title="${displayName}">${displayName} ${sourceBadge}</span>
                         <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono tracking-wider">+${user.no}</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <svg class="w-4 h-4 text-slate-200 dark:text-slate-600 group-hover:text-indigo-300 dark:group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        <span class="status-pill border ${pillClass}" id="stat-${i}">${user._status_ui}</span>
+                    <div class="flex items-center gap-2">
+                        <!-- Tombol Hapus -->
+                        <button onclick="deleteRow(${i}, event)" class="p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 dark:text-slate-600 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-all" title="Hapus Nomor">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                        <!-- Ikon Mata -->
+                        <div class="p-1.5 text-slate-200 dark:text-slate-600 group-hover:text-indigo-300 dark:group-hover:text-indigo-500 transition-all" title="Lihat Preview">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </div>
+                        <span class="status-pill border ${pillClass} ml-1" id="stat-${i}">${user._status_ui}</span>
                     </div>
                 `;
                 statusList.appendChild(log);
