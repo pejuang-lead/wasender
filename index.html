@@ -77,9 +77,6 @@
                 <div class="absolute -right-10 -top-10 opacity-20 animate-pulse">
                     <svg class="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
                 </div>
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-full mb-3 shadow-inner relative z-10">
-                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-                </div>
                 <h2 class="text-2xl font-bold text-white tracking-tight relative z-10">WA Engine Pro</h2>
                 <p class="text-emerald-200 text-xs mt-1 font-mono tracking-widest relative z-10">SECURE SAAS EDITION</p>
             </div>
@@ -274,8 +271,8 @@
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 transition-colors">🚀 Metode Pengiriman</label>
                     <select id="sendMode" onchange="toggleSendMode()" class="w-full text-xs font-bold border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 py-2 cursor-pointer shadow-sm dark:shadow-inner transition-colors">
-                        <option value="wa_web">WA Web / Desktop (Gratis & Otomatis)</option>
-                        <option value="meta_api">Meta Cloud API (Resmi & Anti-Banned)</option>
+                        <option value="wa_web">WA Web / Desktop (Semi-Otomatis)</option>
+                        <option value="meta_api">Meta Cloud API (100% Otomatis)</option>
                     </select>
                 </div>
 
@@ -304,6 +301,12 @@
                     </div>
                     
                     <div id="waWebConfig" class="mt-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 shadow-sm transition-colors">
+                        <!-- Edukasi Mode WA Web UI -->
+                        <div class="mb-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-2 rounded text-[9px] text-amber-700 dark:text-amber-400 font-medium leading-tight">
+                            <b class="uppercase flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Batasan Javascript Browser:</b><br>
+                            Mode ini hanya bisa membukakan tab dan mengetik pesan. Karena aturan Sandbox Browser, Anda <b>TETAP HARUS menekan ENTER (Kirim) secara manual</b> di setiap tab WA.
+                        </div>
+
                         <div class="flex justify-between items-center mb-1.5">
                             <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase flex items-center gap-1 transition-colors">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
@@ -315,6 +318,18 @@
                             <div id="spamProgress" class="bg-emerald-500 h-1.5 rounded-full" style="width: 0%"></div>
                         </div>
                         <p id="spamAdvice" class="text-[9px] text-slate-500 dark:text-slate-400 mt-1.5 leading-tight italic transition-colors">Tulis pesan untuk melihat analisis heuristik otomatis.</p>
+                        
+                        <!-- Smart Focus Wait -->
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                            <div class="flex-1 pr-2">
+                                <label for="useSmartFocus" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> Smart Focus Wait</label>
+                                <p class="text-[8px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Mencegah tab terbuka bertumpuk. Menunggu Anda kembali ke layar ini sebelum lanjut.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                              <input type="checkbox" id="useSmartFocus" checked class="sr-only peer">
+                              <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600 transition-colors"></div>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -612,7 +627,7 @@
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden transition-colors duration-300">
                     <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full"></div>
                     <div class="relative z-10 flex-1 flex flex-col items-start justify-center min-w-0 text-left w-full">
-                        <p class="text-[10px] font-bold text-emerald-500 uppercase truncate w-full" title="Sukses Terkirim">Sukses Terkirim</p>
+                        <p class="text-[10px] font-bold text-emerald-500 uppercase truncate w-full" title="Sukses Diproses" id="labelStatSent">Sukses Diproses</p>
                         <h3 class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 truncate w-full mt-0.5" id="statSent">0</h3>
                     </div>
                 </div>
@@ -658,8 +673,14 @@
                             <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                             Paste Manual
                         </button>
-
+                        
                         <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                        <!-- Clear Data Button -->
+                        <button onclick="clearDataQueue()" id="btnClearData" class="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-red-300 dark:border-red-700/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all" title="Hapus Semua Antrean">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Bersihkan
+                        </button>
 
                         <!-- Export Button -->
                         <button onclick="exportCSV()" id="btnExport" disabled class="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:bg-transparent disabled:cursor-not-allowed" title="Download Laporan">
@@ -838,6 +859,61 @@
         });
 
         // ==========================================
+        // DATA QUEUE CLEAR (BERSIHKAN DATA)
+        // ==========================================
+        function clearDataQueue() {
+            if (rawData.length === 0) {
+                return Swal.fire('Data Kosong', 'Tidak ada data antrean untuk dihapus.', 'info');
+            }
+            
+            Swal.fire({
+                title: 'Bersihkan Antrean?',
+                text: "Seluruh data kontak yang belum terkirim di layar akan dihapus secara permanen dari sesi ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Bersihkan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    rawData = [];
+                    filteredData = [];
+                    availableVariables = [];
+                    currentIndex = 0;
+                    batchSendCounter = 0;
+                    statsTrack = { pending: 0, sent: 0, failed: 0, health: 100, sentA: 0, sentB: 0 };
+                    
+                    document.getElementById('statusList').innerHTML = `
+                        <div class="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
+                            <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            <p class="font-medium">Ruang kerja masih kosong.</p>
+                            <p class="text-xs mt-1 text-center">Gunakan tombol <b>Sinkronisasi</b>, <b>Import CSV</b>, atau <b>Paste Manual</b><br> di atas untuk memuat data target.</p>
+                        </div>
+                    `;
+                    
+                    document.getElementById('badgeTotalData').innerText = '0 Kontak';
+                    document.getElementById('variableChips').innerHTML = '';
+                    document.getElementById('btnExport').disabled = true;
+                    document.getElementById('btnExport').classList.add('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('searchInput').disabled = true;
+                    
+                    const btnStart = document.getElementById('btnStart');
+                    btnStart.disabled = true;
+                    btnStart.className = "w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold py-4 rounded-xl shadow-sm transition-all duration-300 cursor-not-allowed flex justify-center items-center gap-2 text-lg";
+                    document.getElementById('btnStartText').innerText = "Data Kosong";
+                    
+                    updateStatsUI();
+                    updateHealthUI();
+                    clearCurrentSession(); // Hapus memori auto-recovery
+                    
+                    Swal.fire('Dibersihkan!', 'Antrean data telah dikosongkan.', 'success');
+                }
+            });
+        }
+
+        // ==========================================
         // FITUR ONE-CLICK CLOUD UPLOADER
         // ==========================================
         async function handleMediaUpload(event) {
@@ -862,7 +938,6 @@
             formData.append('fileToUpload', file);
 
             try {
-                // Uploading to Free Public CDN (Catbox.moe)
                 const response = await fetch('https://catbox.moe/user/api.php', {
                     method: 'POST',
                     body: formData
@@ -1520,35 +1595,182 @@
             reader.readAsText(file);
         }
 
+        // ==========================================
+        // SMART CSV PARSER 2.0 (BOM, Delimiter, Smart Fallback)
+        // ==========================================
         function processCSVData(csvText, sourceName = "CSV") {
-            const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
-            if (lines.length < 2) return Swal.fire('Data Kosong', 'Data kosong atau tidak memiliki header.', 'warning');
+            // Fix Mac OS (\r) and Windows (\r\n) line break issues
+            const lines = csvText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
+            if (lines.length < 2) return Swal.fire('Data Kosong', 'Data kosong atau tidak memiliki baris kontak.', 'warning');
 
-            function parseCSVRow(str) {
+            // Auto-Detect Delimiter
+            const headerLine = lines[0] || "";
+            let delimiter = ',';
+            const commaCount = (headerLine.match(/,/g) || []).length;
+            const semiCount = (headerLine.match(/;/g) || []).length;
+            const tabCount = (headerLine.match(/\t/g) || []).length;
+
+            if (semiCount > commaCount && semiCount > tabCount) delimiter = ';';
+            else if (tabCount > commaCount && tabCount > semiCount) delimiter = '\t';
+
+            function parseCSVRow(str, delim) {
                 let result = [], inQuotes = false, current = '';
                 for (let i = 0; i < str.length; i++) {
                     let char = str[i];
                     if (char === '"' && str[i+1] === '"') { current += '"'; i++; } 
                     else if (char === '"') { inQuotes = !inQuotes; }
-                    else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
+                    else if (char === delim && !inQuotes) { result.push(current); current = ''; }
                     else { current += char; }
                 }
                 result.push(current);
                 return result;
             }
 
-            const headers = parseCSVRow(lines[0]).map(h => h.trim().toLowerCase());
+            // Stripping BOM (\ufeff) and fixing headers
+            const headers = parseCSVRow(lines[0], delimiter).map(h => {
+                return h.replace(/^\ufeff/g, '').replace(/^"|"$/g, '').trim().toLowerCase();
+            });
+
             const parsedData = [];
 
             for (let i = 1; i < lines.length; i++) {
-                const currentLine = parseCSVRow(lines[i]);
+                const currentLine = parseCSVRow(lines[i], delimiter);
+                // Skip empty lines gracefully
+                if (currentLine.length === 1 && currentLine[0].trim() === "") continue;
+                
                 const obj = { _rowIdx: i + 1 }; 
                 for (let j = 0; j < headers.length; j++) {
-                    if (headers[j]) obj[headers[j]] = currentLine[j] ? currentLine[j].trim() : "";
+                    if (headers[j]) {
+                        obj[headers[j]] = currentLine[j] ? currentLine[j].replace(/^"|"$/g, '').trim() : "";
+                    }
                 }
                 parsedData.push(obj);
             }
             handleDataSuccess(parsedData, sourceName);
+        }
+
+        // Fix Excel mangled digits and prefix issues
+        function sanitizeNumber(rawString) {
+            if (!rawString) return { valid: false, clean: "" };
+            
+            // Convert to string safely
+            let str = String(rawString).trim();
+            let cleanStr = str.replace(/\D/g, '');
+            
+            // Smart patching for missing zero (if user typed 812... instead of 0812...)
+            if (cleanStr.startsWith('0')) {
+                cleanStr = '62' + cleanStr.substring(1);
+            } else if (cleanStr.startsWith('8')) {
+                cleanStr = '62' + cleanStr;
+            }
+            
+            if (cleanStr.length < 9 || cleanStr.length > 15) return { valid: false, clean: cleanStr };
+            if (/^(\d)\1{6,}$/.test(cleanStr.substring(2))) return { valid: false, clean: cleanStr }; 
+            if (cleanStr === '62123456789' || cleanStr === '62000000000') return { valid: false, clean: cleanStr }; 
+            
+            return { valid: true, clean: cleanStr };
+        }
+
+        function handleDataSuccess(data, source = "Sistem") {
+            document.getElementById('loadIcon').classList.remove('animate-spin');
+            document.getElementById('btnLoad').disabled = false;
+            
+            const uniqueData = [];
+            const seenNumbers = new Set();
+            const deadCache = SecureStore.get('wa_dead_cache') || [];
+
+            data.forEach(item => {
+                // Heuristik Pencarian Kolom Nomor
+                let noKey = Object.keys(item).find(k => {
+                    if(!k) return false;
+                    // Bersihkan header dari spasi aneh / karakter khusus
+                    let lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    return ['no', 'nomor', 'hp', 'phone', 'telepon', 'whatsapp', 'wa', 'kontak'].some(keyword => lowerK.includes(keyword));
+                });
+                
+                let rawNum = noKey ? item[noKey] : "";
+                
+                // SMART FALLBACK 2.0: Jika header nomor benar-benar hancur, cari nilai yang berbau angka HP
+                if (!rawNum) {
+                    let potentialKey = Object.keys(item).find(k => {
+                        if (k === '_rowIdx' || k === '_source') return false;
+                        let val = String(item[k]).replace(/\D/g, '');
+                        return (val.startsWith('08') || val.startsWith('628') || val.startsWith('8')) && val.length >= 9 && val.length <= 15;
+                    });
+                    if (potentialKey) {
+                        rawNum = item[potentialKey];
+                        noKey = potentialKey; // Penting agar tidak tumpang tindih dengan pencarian nama
+                    }
+                }
+
+                // SMART FALLBACK 3.0: Nama
+                let nameKey = Object.keys(item).find(k => {
+                    if(!k || k === noKey || k.startsWith('_')) return false;
+                    let lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    return ['nama', 'name', 'pelanggan', 'customer', 'klien', 'client', 'penerima', 'first', 'last', 'kontak'].some(keyword => lowerK.includes(keyword));
+                });
+
+                // Ekstrem Fallback: Jika tidak ketemu header berbau nama, ambil kolom pertama yang berisi TEKS (huruf)
+                if (!nameKey) {
+                    nameKey = Object.keys(item).find(k => {
+                        if (!k || k === noKey || k.startsWith('_')) return false;
+                        let val = String(item[k]).trim();
+                        return /[a-zA-Z]/.test(val) && val.length < 50; 
+                    });
+                }
+
+                let rawName = nameKey ? item[nameKey] : "";
+                const sanitizeResult = sanitizeNumber(rawNum);
+                let processedItem = {...item, _rawNo: rawNum, _source: source};
+
+                // Pastikan 'nama' selalu tersedia untuk UI dan Spintax
+                if (rawName && !processedItem.nama) {
+                    processedItem.nama = String(rawName).trim();
+                }
+                // Jika masih kosong karena alasan apapun tapi ada data di 'name'
+                if (!processedItem.nama && processedItem.name) {
+                    processedItem.nama = String(processedItem.name).trim();
+                }
+
+                if (!sanitizeResult.valid) {
+                    // Munculkan apa yang salah di UI agar klien tahu
+                    processedItem.no = sanitizeResult.clean || rawNum || "Kosong"; 
+                    processedItem._status_ui = 'Format Invalid';
+                    uniqueData.push(processedItem);
+                } else {
+                    processedItem.no = sanitizeResult.clean;
+                    if (!seenNumbers.has(processedItem.no)) {
+                        seenNumbers.add(processedItem.no); 
+                        
+                        if(deadCache.includes(processedItem.no)) {
+                            processedItem._status_ui = 'Invalid (Auto-Cache)';
+                        } else {
+                            processedItem._status_ui = 'Siap';
+                        }
+                        
+                        uniqueData.push(processedItem);
+                    }
+                }
+            });
+
+            rawData = uniqueData;
+            if(rawData.length === 0) {
+                document.getElementById('statusList').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-sm text-center mt-10">Data kosong atau struktur kolom gagal dibaca.</p>';
+                document.getElementById('badgeTotalData').innerText = '0 Kontak';
+                return;
+            }
+
+            availableVariables = Object.keys(rawData[0]).filter(k => k !== '_rowIdx' && k !== '_status_ui' && k !== '_rawNo' && k !== 'no' && k !== '_source');
+            availableVariables.unshift('no');
+            renderVariableChips();
+            
+            document.getElementById('searchInput').disabled = false; document.getElementById('btnExport').disabled = false;
+            document.getElementById('btnExport').classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            statsTrack.health = 100; updateHealthUI(); applyFilter(); clearCurrentSession(); 
+            document.getElementById('btnRecover').classList.add('hidden'); document.getElementById('btnRecover').classList.remove('flex');
+            
+            Swal.fire({ icon: 'success', title: 'Data Berhasil Dimuat', text: `${filteredData.length} kontak telah diimpor dengan aman.`, timer: 2000, showConfirmButton: false });
         }
 
         function initThemeIcons() {
@@ -1733,153 +1955,6 @@
             });
         }
 
-        // ==========================================
-        // HYBRID GSHEETS CONNECTOR
-        // ==========================================
-        function sanitizeNumber(rawString) {
-            if (!rawString) return { valid: false, clean: "" };
-            let cleanStr = String(rawString).replace(/\D/g, '');
-            if (cleanStr.startsWith('0')) cleanStr = '62' + cleanStr.substring(1);
-            
-            if (cleanStr.length < 9 || cleanStr.length > 15) return { valid: false, clean: cleanStr };
-            if (/^(\d)\1{6,}$/.test(cleanStr.substring(2))) return { valid: false, clean: cleanStr }; 
-            if (cleanStr === '62123456789' || cleanStr === '62000000000') return { valid: false, clean: cleanStr }; 
-            
-            return { valid: true, clean: cleanStr };
-        }
-
-        async function fetchDataFromSheet() {
-            const userApi = document.getElementById('userApiUrl').value.trim();
-
-            if(!userApi || userApi === "") {
-                Swal.fire({
-                    title: 'Database Kosong', text: 'Silakan masukkan Link Google Sheets (Pastikan akses Share disetel ke Anyone with link) atau URL Web App Anda.', icon: 'warning', confirmButtonColor: '#059669'
-                });
-                return;
-            }
-
-            const btnLoad = document.getElementById('btnLoad');
-            const icon = document.getElementById('loadIcon');
-            btnLoad.disabled = true; icon.classList.add('animate-spin');
-            document.getElementById('statusList').innerHTML = '<div class="text-center mt-14"><p class="text-indigo-600 dark:text-indigo-400 text-sm animate-pulse font-semibold">Mengunduh Data Database Klien...</p></div>';
-
-            try {
-                if (userApi.includes('script.google.com')) {
-                    const response = await fetch(userApi, {
-                        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'getContacts' })
-                    });
-                    const responseText = await response.text();
-                    const result = JSON.parse(responseText);
-
-                    if (result.status === 'success') {
-                        handleDataSuccess(result.data, "API WebApp");
-                    } else {
-                        throw new Error(result.message || "Gagal memuat data dari server Web App.");
-                    }
-                } else if (userApi.includes('docs.google.com/spreadsheets')) {
-                    const sheetIdMatch = userApi.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                    if (!sheetIdMatch) throw new Error("Link Google Sheets tidak valid. Pastikan link di-copy dengan benar.");
-                    const sheetId = sheetIdMatch[1];
-                    
-                    const gidMatch = userApi.match(/[#&]gid=([0-9]+)/);
-                    const gidParam = gidMatch ? `&gid=${gidMatch[1]}` : '';
-
-                    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv${gidParam}`;
-                    
-                    const response = await fetch(csvUrl);
-                    if (!response.ok) throw new Error("Gagal mengakses Sheet. Pastikan setelan Share adalah 'Siapa saja yang memiliki link' (Anyone with link).");
-                    
-                    const csvText = await response.text();
-                    
-                    if (csvText.trim().startsWith('<!DOCTYPE html>')) {
-                        throw new Error("Akses Ditolak. Pastikan Share setelan Google Sheets diubah dari 'Restricted' menjadi 'Anyone with the link'.");
-                    }
-                    
-                    processCSVData(csvText, "GSheets Direct");
-                    
-                } else {
-                    throw new Error("Format URL tidak dikenali. Masukkan Link Google Sheets atau Web App App Script yang valid.");
-                }
-            } catch (error) {
-                console.error("Sync Error:", error);
-                let errorMsg = error.message;
-                let suggestion = "Gagal terhubung ke Database Google Sheets pengguna.";
-                
-                if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
-                    errorMsg = "Koneksi diblokir oleh Browser atau Google (Failed to fetch).";
-                    suggestion = "Solusi Cepat:\n1. Klik tombol 'Share' (Bagikan) di Google Sheets Anda.\n2. Ubah Akses dari 'Restricted' (Dibatasi) menjadi 'Anyone with the link' (Siapa saja yang memiliki link).\n3. Matikan AdBlocker / Ekstensi Privasi Anda sejenak.";
-                } else if (errorMsg.includes('DataKontak')) {
-                    suggestion = "Solusi: Buka file Google Sheets API Kontak Anda, buat tab (sheet) dengan nama 'DataKontak' (tanpa spasi), dan pastikan ada data kontak di dalamnya.";
-                }
-
-                Swal.fire('Sinkronisasi Gagal', errorMsg + "\n\n" + suggestion, 'error');
-                btnLoad.disabled = false; icon.classList.remove('animate-spin');
-                document.getElementById('statusList').innerHTML = `
-                    <div class="text-center mt-10 px-4">
-                        <svg class="w-12 h-12 text-red-400 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        <p class="text-red-500 font-bold text-sm mb-1">Gagal Sinkronisasi</p>
-                        <p class="text-slate-500 dark:text-slate-400 text-xs mb-3">${errorMsg}</p>
-                        <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-semibold p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded border border-indigo-100 dark:border-indigo-800">${suggestion}</p>
-                    </div>
-                `;
-            }
-        }
-
-        function handleDataSuccess(data, source = "Sistem") {
-            document.getElementById('loadIcon').classList.remove('animate-spin');
-            document.getElementById('btnLoad').disabled = false;
-            
-            const uniqueData = [];
-            const seenNumbers = new Set();
-            
-            const deadCache = SecureStore.get('wa_dead_cache') || [];
-
-            data.forEach(item => {
-                let noKey = Object.keys(item).find(k => k.toLowerCase() === 'no' || k.toLowerCase().includes('nomor') || k.toLowerCase() === 'hp' || k.toLowerCase() === 'phone' || k.toLowerCase() === 'telepon');
-                let rawNum = item[noKey] || "";
-                const sanitizeResult = sanitizeNumber(rawNum);
-                let processedItem = {...item, _rawNo: rawNum, _source: source};
-
-                if (!sanitizeResult.valid) {
-                    processedItem.no = sanitizeResult.clean || "Kosong"; processedItem._status_ui = 'Format Invalid';
-                    uniqueData.push(processedItem);
-                } else {
-                    processedItem.no = sanitizeResult.clean;
-                    if (!seenNumbers.has(processedItem.no)) {
-                        seenNumbers.add(processedItem.no); 
-                        
-                        if(deadCache.includes(processedItem.no)) {
-                            processedItem._status_ui = 'Invalid (Auto-Cache)';
-                        } else {
-                            processedItem._status_ui = 'Siap';
-                        }
-                        
-                        uniqueData.push(processedItem);
-                    }
-                }
-            });
-
-            rawData = uniqueData;
-            if(rawData.length === 0) {
-                document.getElementById('statusList').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-sm text-center mt-10">Data kosong/tidak valid.</p>';
-                document.getElementById('badgeTotalData').innerText = '0 Kontak';
-                return;
-            }
-
-            availableVariables = Object.keys(rawData[0]).filter(k => k !== '_rowIdx' && k !== '_status_ui' && k !== '_rawNo' && k !== 'no' && k !== '_source');
-            availableVariables.unshift('no');
-            renderVariableChips();
-            
-            document.getElementById('searchInput').disabled = false; document.getElementById('btnExport').disabled = false;
-            document.getElementById('btnExport').classList.remove('opacity-50', 'cursor-not-allowed');
-            
-            statsTrack.health = 100; updateHealthUI(); applyFilter(); clearCurrentSession(); 
-            document.getElementById('btnRecover').classList.add('hidden'); document.getElementById('btnRecover').classList.remove('flex');
-            
-            Swal.fire({ icon: 'success', title: 'Data Berhasil Dimuat', text: `${filteredData.length} kontak valid siap dieksekusi dari ${source}.`, timer: 2000, showConfirmButton: false });
-        }
-
         function renderVariableChips() {
             const chips = document.getElementById('variableChips'); chips.innerHTML = '';
             availableVariables.forEach(v => {
@@ -1918,14 +1993,21 @@
             const statusList = document.getElementById('statusList'); statusList.innerHTML = '';
             filteredData.forEach((user, i) => {
                 const log = document.createElement('div'); log.id = `row-item-${i}`;
-                let displayName = user.nama || user.name || user.pelanggan || "Tanpa Nama";
-                if (!displayName.trim() && user.no) displayName = "No Name"; 
+                
+                // [NEW] EXTREME FALLBACK UNTUK NAMA TAMPILAN
+                let displayName = user.nama || user.name || user.pelanggan || "";
+                if (!displayName || !String(displayName).trim()) {
+                    const anyKey = Object.keys(user).find(k => k !== 'no' && !k.startsWith('_'));
+                    if (anyKey) displayName = user[anyKey];
+                }
+                if (!displayName || !String(displayName).trim()) displayName = "Tanpa Nama";
+                if (displayName === "Tanpa Nama" && user.no) displayName = "No Name"; 
                 
                 let pillClass = "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700";
                 
                 if(user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Invalid (Auto-Cache)') {
                     pillClass = "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800";
-                } else if(user._status_ui.includes('Terkirim')) {
+                } else if(user._status_ui.includes('Dialihkan') || user._status_ui.includes('Terkirim')) {
                     pillClass = "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
                 } else if(user._status_ui === 'Diabaikan (Blacklist)') {
                     pillClass = "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
@@ -1941,8 +2023,8 @@
                 log.onclick = () => showLivePreview(i);
 
                 log.innerHTML = `
-                    <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">${displayName} ${sourceBadge}</span>
+                    <div class="flex flex-col max-w-[65%]">
+                        <span class="font-bold text-sm text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition truncate" title="${displayName}">${displayName} ${sourceBadge}</span>
                         <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono tracking-wider">+${user.no}</span>
                     </div>
                     <div class="flex items-center gap-3">
@@ -2024,7 +2106,7 @@
             const isDark = document.documentElement.classList.contains('dark');
             donutChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['Sisa Antrean', 'Sukses Terkirim', 'Gagal/Invalid'], datasets: [{ data: [0, 0, 0], backgroundColor: [isDark ? '#334155' : '#e2e8f0', '#059669', '#dc2626'], borderWidth: 0, cutout: '75%', hoverOffset: 4 }] },
+                data: { labels: ['Sisa Antrean', 'Sukses Diproses', 'Gagal/Invalid'], datasets: [{ data: [0, 0, 0], backgroundColor: [isDark ? '#334155' : '#e2e8f0', '#059669', '#dc2626'], borderWidth: 0, cutout: '75%', hoverOffset: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true } }, animation: { duration: 500 } }
             });
         }
@@ -2080,20 +2162,33 @@
             document.getElementById('etaTime').innerText = `ETA: ${etaText}`;
         }
 
-        function handleStartAction() {
+        async function handleStartAction() {
             const sendMode = document.getElementById('sendMode').value;
             
-            if (sendMode === 'meta_api') {
+            if (sendMode === 'wa_web') {
+                const confirmWAWeb = await Swal.fire({
+                    title: 'Info Mode WA Web',
+                    html: 'Karena sistem keamanan Browser (Sandbox), mode WA Web <b>tidak bisa menekan tombol kirim secara otomatis</b>.<br><br>Sistem hanya akan membukakan tab baru dan mengetikkan pesan untuk Anda. Anda <b>TETAP HARUS menekan tombol Kirim / Enter secara manual</b> di setiap tab WA.<br><br>Jika Anda ingin pengiriman 100% otomatis di latar belakang, gunakan mode <b>Meta Cloud API</b>.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Mengerti, Mulai',
+                    cancelButtonText: 'Batal'
+                });
+                
+                if(!confirmWAWeb.isConfirmed) return;
+                
+                if(!document.getElementById('message').value.trim()) {
+                    return Swal.fire('Pesan Kosong', 'Silakan isi kolom Teks Utama terlebih dahulu.', 'warning');
+                }
+            } else if (sendMode === 'meta_api') {
                 const token = document.getElementById('metaToken').value.trim();
                 const phoneId = document.getElementById('metaPhoneId').value.trim();
                 const template = document.getElementById('metaTemplateName').value.trim();
                 
                 if (!token || !phoneId || !template) {
                     return Swal.fire('Kredensial Meta Kosong', 'Harap lengkapi Meta Access Token, Phone ID, dan Nama Template.', 'error');
-                }
-            } else {
-                if(!document.getElementById('message').value.trim()) {
-                    return Swal.fire('Pesan Kosong', 'Silakan isi kolom Teks Utama terlebih dahulu.', 'warning');
                 }
             }
 
@@ -2128,7 +2223,8 @@
                 if(!['_rowIdx','_status_ui','_rawNo','_source'].includes(key)) {
                     let val = userObj[key];
                     if((key === 'nama' || key === 'name') && (!val || val.trim() === '')) val = fallbackStr;
-                    processed = processed.replace(new RegExp(`{${key}}`, 'gi'), val);
+                    const escapedKey = String(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    processed = processed.replace(new RegExp(`\\{${escapedKey}\\}`, 'gi'), val);
                 }
             }
 
@@ -2265,7 +2361,7 @@
                 while (isPaused && !stopRequested) await new Promise(r => setTimeout(r, 500)); 
                 if (stopRequested) break;
 
-                if(user._status_ui.includes('Terkirim') || user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Invalid (Auto-Cache)' || user._status_ui === 'Diabaikan (Blacklist)') continue;
+                if(user._status_ui.includes('Dialihkan') || user._status_ui.includes('Terkirim') || user._status_ui === 'Format Invalid' || user._status_ui === 'Gagal' || user._status_ui === 'Invalid (Auto-Cache)' || user._status_ui === 'Diabaikan (Blacklist)') continue;
 
                 // Cek Blacklist (Opt-out) System
                 if(blacklistDB.includes(user.no)) {
@@ -2294,7 +2390,8 @@
                     // Injeksi URL Lampiran ke Teks jika WA Web
                     if (finalMediaUrl) finalMsg += `\n\n📄 *Dokumen Lampiran:*\n${finalMediaUrl}`;
                     
-                    window.open(`https://wa.me/${user.no}?text=${encodeURIComponent(finalMsg)}`, '_blank');
+                    // Menggunakan nama target tab spesifik agar browser me-reuse tab yang sama
+                    window.open(`https://web.whatsapp.com/send?phone=${user.no}&text=${encodeURIComponent(finalMsg)}`, 'WA_WEB_TAB');
                     isSendSuccess = true; 
                 } 
                 else if (sendMode === 'meta_api') {
@@ -2376,7 +2473,14 @@
                     }
                 }
 
-                setRowStatus(currentIndex, isSendSuccess ? (isVariantB ? "Terkirim (Var B)" : "Terkirim (Var A)") : "Gagal", isSendSuccess, isVariantB);
+                let successStr = "";
+                if (sendMode === 'meta_api') {
+                    successStr = isVariantB ? "Terkirim API (B)" : "Terkirim API (A)";
+                } else {
+                    successStr = isVariantB ? "Dialihkan (B)" : "Dialihkan (A)";
+                }
+                
+                setRowStatus(currentIndex, isSendSuccess ? successStr : "Gagal", isSendSuccess, isVariantB);
                 
                 if (isSendSuccess) {
                     consecutiveMetaErrors = 0; // Reset error counter
@@ -2460,6 +2564,21 @@
                         const delayLog = createDelayLog(currentIndex, `⏳ Jeda pengiriman: ${Math.floor(delayMs/1000)}s ${typingTextLog}`);
                         const endTime = Date.now() + delayMs;
                         while(Date.now() < endTime) { if (stopRequested) break; await new Promise(r => setTimeout(r, 200)); }
+                        
+                        // SMART FOCUS WAIT (Cegah Tab Bertumpuk)
+                        if (document.getElementById('useSmartFocus') && document.getElementById('useSmartFocus').checked) {
+                            if (!document.hasFocus() && !stopRequested && !isPaused) {
+                                const focusLog = createDelayLog(currentIndex, `👀 Menunggu Anda kembali ke layar Dashboard ini...`);
+                                updateBadge("MENUNGGU FOKUS", "bg-amber-400");
+                                while(!document.hasFocus()) {
+                                    if (stopRequested || isPaused) break;
+                                    await new Promise(r => setTimeout(r, 500));
+                                }
+                                if(!isPaused && !stopRequested) updateBadge("ENGINE RUNNING", "bg-emerald-400");
+                                if(focusLog) focusLog.remove();
+                            }
+                        }
+                        
                         if(delayLog) delayLog.remove();
                     }
                 } else {
