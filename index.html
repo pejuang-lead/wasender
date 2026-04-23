@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WA Enterprise Dashboard - Secure Edition</title>
+    <title>WA Enterprise Dashboard - Web Automation Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class', theme: { extend: {} } }
@@ -236,7 +236,7 @@
             </div>
             <div>
                 <h1 class="text-lg font-bold text-slate-800 dark:text-white leading-tight transition-colors">WA Engine Pro</h1>
-                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold tracking-widest transition-colors">AES-256 ENCRYPTED</p>
+                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold tracking-widest transition-colors">WA WEB EDITION</p>
             </div>
         </div>
 
@@ -332,26 +332,27 @@
                     </div>
                 </div>
 
-                <!-- URL Lampiran (Dinamis + Upload) -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🔗 URL Lampiran (Atau Upload File)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="mediaUrl" placeholder="https://domain.com/file_{resi}.pdf" class="flex-1 border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors font-mono">
-                            <input type="file" id="mediaUploadInput" accept="image/*,video/*,application/pdf" class="hidden" onchange="handleMediaUpload(event)">
-                            <button type="button" onclick="document.getElementById('mediaUploadInput').click()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-400 px-3 py-2 rounded-lg font-bold text-xs border border-indigo-200 dark:border-indigo-800 transition-colors shadow-sm flex items-center gap-1.5 whitespace-nowrap" title="Upload Gambar, Video, atau PDF ke Cloud Server">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                Upload File
-                            </button>
-                        </div>
-                        <p class="text-[8px] text-slate-400 mt-1.5 leading-tight">*Maksimal 50MB. File akan diunggah ke Public Cloud CDN agar dapat dibaca oleh API WhatsApp.</p>
+                <!-- URL Lampiran (Native Paste) -->
+                <div class="col-span-2 mt-3">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">📎 Lampiran Gambar Asli (Manual Paste)</label>
+                    <div class="flex gap-2">
+                        <input type="file" id="mediaUploadInput" accept="image/png, image/jpeg, image/jpg" class="hidden" onchange="handleLocalMediaSelect(event)">
+                        <button type="button" onclick="document.getElementById('mediaUploadInput').click()" class="flex-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg font-bold text-xs border border-slate-300 dark:border-slate-700 transition-colors shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap hover:bg-slate-50 dark:hover:bg-slate-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            Pilih Gambar
+                        </button>
+                        <button type="button" id="btnCopyMedia" onclick="copyMediaToClipboard()" disabled class="flex-1 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-3 py-2 rounded-lg font-bold text-xs border border-indigo-200 dark:border-indigo-800 transition-colors shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap opacity-50 cursor-not-allowed">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            Salin (Copy)
+                        </button>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🛡️ Fallback {nama}</label>
-                        <input type="text" id="fallbackName" value="Bapak/Ibu" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors">
-                    </div>
+                    <p class="text-[8px] text-slate-400 mt-1.5 leading-tight">*Karena proteksi WhatsApp Web, klik <b>Salin</b> di atas, lalu tekan <b>Ctrl+V (Paste)</b> di dalam tab WhatsApp secara manual agar gambar terkirim murni sebagai file tanpa link.</p>
                 </div>
-
+                
+                <div class="col-span-2 mt-3">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 transition-colors">🛡️ Fallback {nama}</label>
+                    <input type="text" id="fallbackName" value="Bapak/Ibu" class="w-full border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-2 focus:ring-indigo-500 shadow-sm transition-colors">
+                </div>
             </div>
 
             <!-- KEAMANAN & KEPATUHAN (BLACKLIST) -->
@@ -787,6 +788,8 @@
         let donutChart = null;
         let barChart = null;
         let waWindow = null; // Variable Global untuk Reusability Tab WA Web
+        
+        let selectedMediaBlob = null; // Menyimpan memori lampiran lokal
 
         const LS_CAMPAIGN_KEY = 'wa_sec_campaigns_v9';
         const LS_SESSION_KEY = 'wa_sec_recovery_v9';
@@ -893,64 +896,67 @@
         }
 
         // ==========================================
-        // FITUR ONE-CLICK CLOUD UPLOADER
+        // NATIVE CLIPBOARD IMAGE ATTACHMENT
         // ==========================================
-        async function handleMediaUpload(event) {
+        function handleLocalMediaSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (file.size > 50 * 1024 * 1024) {
-                Swal.fire('Ukuran Melebihi Batas', 'Maksimal ukuran file adalah 50MB.', 'warning');
+            if (!file.type.startsWith('image/')) {
+                Swal.fire('Format Tidak Didukung', 'Saat ini Clipboard API browser hanya mendukung gambar (PNG/JPG).', 'warning');
                 event.target.value = '';
                 return;
             }
 
+            selectedMediaBlob = file;
+            
+            const btnCopy = document.getElementById('btnCopyMedia');
+            btnCopy.disabled = false;
+            btnCopy.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-indigo-50', 'text-indigo-600', 'dark:bg-indigo-900/30', 'dark:text-indigo-400');
+            btnCopy.classList.add('bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-md');
+            btnCopy.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg> Salin (Copy)`;
+            
             Swal.fire({
-                title: 'Mengunggah File...',
-                html: 'Mempersiapkan media ke Public Cloud...<br><br><span class="text-xs text-slate-500">Mungkin memakan waktu beberapa detik.</span>',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
+                icon: 'success',
+                title: 'Gambar Terpilih',
+                text: 'Silakan klik tombol "Salin (Copy)" sebelum Anda memulai pengiriman massal.',
+                timer: 3000,
+                showConfirmButton: false
             });
+        }
 
-            const formData = new FormData();
-            formData.append('file', file);
-
+        async function copyMediaToClipboard() {
+            if (!selectedMediaBlob) return;
+            
             try {
-                // Menggunakan TmpFiles API yang lebih ramah CORS (Cross-Origin)
-                const response = await fetch('https://tmpfiles.org/api/v1/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                let blobToCopy = selectedMediaBlob;
                 
-                const resJson = await response.json();
-                
-                if (resJson.status === 'success' && resJson.data && resJson.data.url) {
-                    // Konversi URL ke mode Direct Download agar terbaca Meta API
-                    let directUrl = resJson.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-                    document.getElementById('mediaUrl').value = directUrl;
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Unggah Berhasil',
-                        text: 'URL Lampiran telah berhasil dibuat dan siap dikirim!',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                } else {
-                    throw new Error("Respon API tidak valid.");
+                // Konversi format ke PNG karena standar ClipboardItem browser mewajibkan image/png
+                if (selectedMediaBlob.type !== 'image/png') {
+                   const img = new Image();
+                   const url = URL.createObjectURL(selectedMediaBlob);
+                   img.src = url;
+                   await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; });
+                   const canvas = document.createElement('canvas');
+                   canvas.width = img.width; canvas.height = img.height;
+                   const ctx = canvas.getContext('2d');
+                   ctx.drawImage(img, 0, 0);
+                   blobToCopy = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                   URL.revokeObjectURL(url);
                 }
-            } catch (error) {
-                console.error('Upload Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Upload Gagal (CORS/Network)',
-                    html: 'Browser Anda memblokir upload pihak ketiga karena alasan keamanan Sandbox (CORS), atau server sedang penuh.<br><br><b>Solusi Alternatif:</b><br>1. Unggah file Anda ke <b>Google Drive</b> / <b>Imgur</b><br>2. Pastikan file bersifat "Public"<br>3. Copy link-nya dan paste secara manual di kolom URL.',
-                    confirmButtonColor: '#4f46e5'
-                });
-            } finally {
-                event.target.value = '';
+
+                const item = new ClipboardItem({ 'image/png': blobToCopy });
+                await navigator.clipboard.write([item]);
+                
+                const btnCopy = document.getElementById('btnCopyMedia');
+                btnCopy.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tersalin!`;
+                btnCopy.classList.replace('bg-indigo-600', 'bg-emerald-500');
+                btnCopy.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
+
+                Swal.fire('Gambar Siap di Clipboard!', 'Nanti saat tab WhatsApp Web terbuka, Anda cukup tekan Ctrl+V (Paste) lalu tekan Enter untuk mengirim file asli secara cepat.', 'success');
+            } catch (e) {
+                console.error(e);
+                Swal.fire('Gagal Menyalin', 'Browser memblokir akses Clipboard otomatis. Pastikan browser Anda mengizinkan akses Clipboard.', 'error');
             }
         }
 
@@ -1133,6 +1139,32 @@
                 handleDataSuccess(parsedData, "Paste Manual");
                 closeManualInput();
             }, 300);
+        }
+
+        // ==========================================
+        // AUTO-SYNC META CREDENTIALS TO ADMIN BACKEND
+        // ==========================================
+        async function syncMetaToCloud() {
+            const userSession = SecureStore.get(LS_AUTH_USER);
+            if (!userSession || !userSession.email) return;
+
+            const mToken = document.getElementById('metaToken') ? document.getElementById('metaToken').value.trim() : "";
+            const mPhone = document.getElementById('metaPhoneId') ? document.getElementById('metaPhoneId').value.trim() : "";
+            const mTmpl = document.getElementById('metaTemplateName') ? document.getElementById('metaTemplateName').value.trim() : "";
+
+            SecureStore.set('wa_meta_token', mToken);
+            SecureStore.set('wa_meta_phone', mPhone);
+            SecureStore.set('wa_meta_template', mTmpl);
+
+            try {
+                if (API_GATEWAY.ADMIN_AUTH) {
+                    fetch(API_GATEWAY.ADMIN_AUTH, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'save_meta', email: userSession.email, metaToken: mToken, metaPhoneId: mPhone, metaTemplate: mTmpl })
+                    });
+                }
+            } catch(e) { console.error('Gagal auto-sync Meta Creds ke Cloud', e); }
         }
 
         // ==========================================
@@ -1798,7 +1830,6 @@
             const prof = campaignProfiles[key];
             
             document.getElementById('message').value = prof.msg || '';
-            document.getElementById('mediaUrl').value = prof.url || '';
             document.getElementById('fallbackName').value = prof.fallback || 'Bapak/Ibu';
             document.getElementById('minDelay').value = prof.minDelay || 15;
             document.getElementById('maxDelay').value = prof.maxDelay || 45;
@@ -1814,9 +1845,7 @@
             document.getElementById('workEnd').value = prof.workEnd || '22:00';
             document.getElementById('interventionLimit').value = prof.interventionLimit || 40;
             
-            if(prof.metaButtonParam !== undefined) document.getElementById('metaButtonParam').value = prof.metaButtonParam;
             if(prof.messageB !== undefined) document.getElementById('messageB').value = prof.messageB;
-            if(prof.metaTemplateB !== undefined) document.getElementById('metaTemplateNameB').value = prof.metaTemplateB;
             if(prof.useAB !== undefined) {
                 document.getElementById('abTestToggle').checked = prof.useAB;
                 toggleABTest();
@@ -1831,7 +1860,7 @@
             const profileName = prompt("Nama Kampanye (Contoh: Promo Pagi):", "Kampanye Baru");
             if (profileName && profileName.trim()) {
                 campaignProfiles[profileName.trim()] = {
-                    msg: msg, url: document.getElementById('mediaUrl').value.trim(),
+                    msg: msg,
                     fallback: document.getElementById('fallbackName').value.trim(),
                     minDelay: document.getElementById('minDelay').value, maxDelay: document.getElementById('maxDelay').value,
                     batchSize: document.getElementById('batchSize').value, restTime: document.getElementById('restTime').value,
@@ -1841,10 +1870,8 @@
                     useSmartTimezone: document.getElementById('useSmartTimezone') ? document.getElementById('useSmartTimezone').checked : false,
                     workStart: document.getElementById('workStart').value,
                     workEnd: document.getElementById('workEnd').value, interventionLimit: document.getElementById('interventionLimit').value,
-                    metaButtonParam: document.getElementById('metaButtonParam').value.trim(),
                     useAB: document.getElementById('abTestToggle').checked,
-                    messageB: document.getElementById('messageB').value.trim(),
-                    metaTemplateB: document.getElementById('metaTemplateNameB').value.trim()
+                    messageB: document.getElementById('messageB').value.trim()
                 };
                 SecureStore.set(LS_CAMPAIGN_KEY, campaignProfiles);
                 updateCampaignDropdown(); document.getElementById('campaignSelect').value = profileName.trim();
@@ -1974,17 +2001,14 @@
         function showLivePreview(index) {
             const user = filteredData[index];
             const rawTemplate = document.getElementById('message').value;
-            const mediaUrlRaw = document.getElementById('mediaUrl').value.trim();
-            const btnParamRaw = document.getElementById('metaButtonParam').value.trim();
             
             const attachmentUI = document.getElementById('previewAttachmentInfo');
             
             if(!rawTemplate.trim()) return Swal.fire('Informasi', 'Isi teks pesan Utama terlebih dahulu untuk melihat Pratinjau.', 'info');
             document.getElementById('previewText').innerText = processMessage(rawTemplate, user, false);
 
-            if (mediaUrlRaw) {
-                let dynamicUrl = processMessage(mediaUrlRaw, user, false);
-                attachmentUI.innerHTML = `📎 <strong>Lampiran:</strong><br><a href="#" class="text-indigo-500 underline break-words">${dynamicUrl}</a>`;
+            if (selectedMediaBlob) {
+                attachmentUI.innerHTML = `📎 <strong>Status Lampiran:</strong><br><span class="text-emerald-600">Gambar/File telah disalin ke Clipboard (Siap Paste)</span>`;
                 attachmentUI.classList.remove('hidden');
             } else {
                 attachmentUI.classList.add('hidden');
@@ -2071,7 +2095,7 @@
         async function handleStartAction() {
             const confirmWAWeb = await Swal.fire({
                 title: 'Konfirmasi Pengiriman',
-                html: 'Sistem akan membuka tab WhatsApp Web dan menyiapkan pesan.<br><br>Anda <b>TETAP HARUS menekan tombol Kirim / Enter secara manual</b> pada WhatsApp Web tersebut.',
+                html: 'Sistem akan memuat tab WhatsApp Web dan menyiapkan pesan teks secara otomatis.<br><br><b>PENTING:</b><br>1. Anda <b>TETAP HARUS menekan ENTER / Kirim</b> secara manual.<br>2. Jika Anda melampirkan gambar, tekan <b>Ctrl+V (Paste)</b> lalu Enter.',
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#059669',
@@ -2224,12 +2248,11 @@
             const userApi = document.getElementById('userApiUrl').value.trim();
             
             const msgTemplateRawA = document.getElementById('message').value;
-            const mediaUrlRaw = document.getElementById('mediaUrl').value.trim();
             const fallbackStr = document.getElementById('fallbackName').value || "";
             
             // A/B Testing Prep
             const useABTesting = document.getElementById('abTestToggle').checked;
-            const msgTemplateRawB = document.getElementById('messageB').value;
+            const msgTemplateRawB = document.getElementById('messageB') ? document.getElementById('messageB').value : "";
             
             // Mengambil data Blacklist dari SecureStore
             const blacklistDB = SecureStore.get('wa_blacklist') || [];
@@ -2264,18 +2287,8 @@
                 let isVariantB = useABTesting && (currentIndex % 2 !== 0);
                 let currentMsgTemplate = isVariantB && msgTemplateRawB ? msgTemplateRawB : msgTemplateRawA;
 
-                // 1. MEMBUAT LAMPIRAN DINAMIS (Berdasarkan variabel user)
-                let finalMediaUrl = "";
-                if (mediaUrlRaw) {
-                    finalMediaUrl = processMessage(mediaUrlRaw, user, false); // Parse URL, hilangkan ZeroWidth
-                }
-
-                // 2. LOGIKA PENGIRIMAN
+                // LOGIKA PENGIRIMAN WA WEB (Single Method)
                 let finalMsg = processMessage(currentMsgTemplate, user, true);
-                
-                // Injeksi URL Lampiran ke Teks jika WA Web
-                if (finalMediaUrl) finalMsg += `\n\n📄 *Dokumen Lampiran:*\n${finalMediaUrl}`;
-                
                 const waUrl = `https://web.whatsapp.com/send?phone=${user.no}&text=${encodeURIComponent(finalMsg)}`;
                 
                 // Smart Tab Reusability
@@ -2283,7 +2296,7 @@
                     waWindow = window.open(waUrl, 'WA_WEB_TAB');
                 } else {
                     try {
-                        waWindow.location.href = waUrl;
+                        waWindow.location = waUrl;
                         waWindow.focus();
                     } catch(e) {
                         waWindow = window.open(waUrl, 'WA_WEB_TAB');
@@ -2296,7 +2309,6 @@
                 setRowStatus(currentIndex, isSendSuccess ? successStr : "Gagal", isSendSuccess, isVariantB);
                 
                 if (isSendSuccess) {
-                    consecutiveMetaErrors = 0; // Reset error counter
                     batchSendCounter++;
                     if(batchSendCounter % 5 === 0) saveCurrentSession();
                     
@@ -2350,18 +2362,23 @@
                         min *= 2; max *= 2;
                     }
 
-                    let delaySeconds = Math.floor(Math.random() * (Math.max(min, max) - Math.min(min, max) + 1) + Math.min(min, max));
-                    let delayMs = delaySeconds * 1000;
+                    let baseDelay = Math.floor(Math.random() * (Math.max(min, max) - Math.min(min, max) + 1) + Math.min(min, max));
+                    let delayMs = baseDelay * 1000;
 
                     let typingTextLog = "";
                     if(document.getElementById('useTypingSpeed').checked) {
                         const msgLength = currentMsgTemplate.length || 50;
                         const typingMs = msgLength * 40; 
+                        const typingSec = Math.floor(typingMs/1000);
                         delayMs += typingMs;
-                        typingTextLog = `+ Ketik: ${Math.floor(typingMs/1000)}s`;
+                        typingTextLog = ` + Ketik: ${typingSec}s`;
                     }
 
-                    const delayLog = createDelayLog(currentIndex, `⏳ Jeda pengiriman: ${Math.floor(delayMs/1000)}s ${typingTextLog}`);
+                    let totalWait = Math.floor(delayMs/1000);
+                    let warmupText = (document.getElementById('useWarmup').checked && currentIndex < 20) ? " (Pemanasan x2)" : "";
+                    
+                    const delayLog = createDelayLog(currentIndex, `⏳ Jeda Dasar: ${baseDelay}s${typingTextLog} = Tunggu ${totalWait}s${warmupText}`);
+                    
                     const endTime = Date.now() + delayMs;
                     while(Date.now() < endTime) { if (stopRequested) break; await new Promise(r => setTimeout(r, 200)); }
                     
