@@ -296,22 +296,19 @@
                         <label class="flex justify-between text-[10px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mb-1.5 transition-colors">
                             <span>📝 Variasi Teks B (A/B Test)</span>
                         </label>
-                        <textarea id="messageB" oninput="analyzeSpamScore()" rows="4" class="w-full border-indigo-200 dark:border-indigo-700/50 rounded-lg bg-indigo-50/30 dark:bg-indigo-900/10 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 p-3 text-sm shadow-sm transition-colors placeholder-slate-400" placeholder="Variasi pesan/template kedua untuk dites..."></textarea>
+                        <textarea id="messageB" rows="4" class="w-full border-indigo-200 dark:border-indigo-700/50 rounded-lg bg-indigo-50/30 dark:bg-indigo-900/10 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 p-3 text-sm shadow-sm transition-colors placeholder-slate-400" placeholder="Variasi pesan/template kedua untuk dites..."></textarea>
                     </div>
                     
                     <div id="waWebConfig" class="mt-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 shadow-sm transition-colors">
-                        <!-- Edukasi Mode WA Web UI -->
-                        <div class="mb-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-2 rounded text-[9px] text-amber-700 dark:text-amber-400 font-medium leading-tight">
-                            <b class="uppercase flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Batasan Javascript Browser:</b><br>
-                            Mode ini membukakan tab WA Web dan mengetik pesan. Karena aturan Sandbox Browser, Anda <b>TETAP HARUS menekan ENTER (Kirim) secara manual</b> di setiap tab WA.
-                        </div>
-
                         <div class="flex justify-between items-center mb-1.5">
                             <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase flex items-center gap-1 transition-colors">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                 Spam Risk Analyzer
                             </span>
-                            <span id="spamScoreText" class="text-xs font-bold text-emerald-500">0% (Aman)</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="aiSpamCheck()" class="text-[9px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800 hover:bg-amber-200 font-bold flex items-center gap-1">🤖 Analisis AI</button>
+                                <span id="spamScoreText" class="text-xs font-bold text-emerald-500">0% (Aman)</span>
+                            </div>
                         </div>
                         <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden transition-colors">
                             <div id="spamProgress" class="bg-emerald-500 h-1.5 rounded-full" style="width: 0%"></div>
@@ -372,12 +369,24 @@
 
             <!-- 3. ULTIMATE ANTI-BAN MODULE -->
             <div id="antiBanModule" class="space-y-4 bg-slate-50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-inner transition-colors mt-3">
-                <h3 class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 transition-colors">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    Ultimate Anti-Ban (Khusus WA Web)
-                </h3>
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <h3 class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 transition-colors">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Ultimate Anti-Ban
+                    </h3>
+                    
+                    <!-- AI Auto-Config (Account Warming) -->
+                    <div class="flex items-center gap-2">
+                        <select id="aiAccountAge" class="text-[9px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded py-0.5 px-1 font-bold text-slate-600 dark:text-slate-300 focus:outline-none">
+                            <option value="baru">Akun Baru (< 1 Bln)</option>
+                            <option value="sedang">Normal (1-3 Bln)</option>
+                            <option value="lama" selected>Verified (> 3 Bln)</option>
+                        </select>
+                        <button onclick="aiAutoConfig()" class="text-[9px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 px-1.5 py-0.5 rounded font-bold hover:bg-indigo-200 flex items-center gap-1 shadow-sm">⚙️ AI Auto-Set</button>
+                    </div>
+                </div>
                 
-                <div class="space-y-4">
+                <div class="space-y-4 pt-2">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex-1">
                             <label for="useZeroWidth" class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors block cursor-pointer">Zero-Width Hash Breaker</label>
@@ -437,7 +446,7 @@
                     <div>
                         <label class="block text-[10px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Wajib Intervensi</label>
                         <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1.5 leading-tight transition-colors">Jeda otomatis pengamanan rasio Inbound.</p>
-                        <input type="number" id="interventionLimit" value="40" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
+                        <input type="number" id="interventionLimit" value="20" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
                     </div>
                 </div>
 
@@ -445,18 +454,18 @@
                     <div>
                         <label class="block text-[9px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Min. Delay</label>
                         <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1 leading-tight">Waktu batas bawah.</p>
-                        <input type="number" id="minDelay" value="15" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
+                        <input type="number" id="minDelay" value="25" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Max. Delay</label>
                         <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1 leading-tight">Waktu batas atas.</p>
-                        <input type="number" id="maxDelay" value="45" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
+                        <input type="number" id="maxDelay" value="60" class="w-full border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-indigo-500 shadow-sm transition-colors">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-700 dark:text-slate-200 mb-0.5 transition-colors">Batch / Rest</label>
                         <p class="text-[8px] text-slate-500 dark:text-slate-400 mb-1 leading-tight">Batas Pesan / Durasi (Mnt).</p>
                         <div class="flex border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden shadow-sm transition-colors">
-                            <input type="number" id="batchSize" value="50" class="w-1/2 bg-transparent text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center border-r border-slate-200 dark:border-slate-700 focus:ring-0 transition-colors" title="Pesan per Batch">
+                            <input type="number" id="batchSize" value="25" class="w-1/2 bg-transparent text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center border-r border-slate-200 dark:border-slate-700 focus:ring-0 transition-colors" title="Pesan per Batch">
                             <input type="number" id="restTime" value="10" class="w-1/2 bg-transparent text-slate-800 dark:text-slate-200 p-1.5 text-xs text-center focus:ring-0 transition-colors" title="Menit Istirahat">
                         </div>
                     </div>
@@ -615,7 +624,7 @@
                     
                     <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-end">
                         <!-- Sinkronisasi Button -->
-                        <button onclick="fetchDataFromSheet()" id="btnLoad" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all border border-indigo-500 hover:border-indigo-600">
+                        <button onclick="fetchDataFromSheet()" id="btnLoad" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all border border-indigo-50 hover:border-indigo-600">
                             <svg id="loadIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             Sinkronisasi
                         </button>
@@ -633,6 +642,14 @@
                         <button onclick="openManualInput()" class="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all" title="Paste Nomor Manual">
                             <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                             Paste Manual
+                        </button>
+                        
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                        <!-- AI Clean Data Button (NEW) -->
+                        <button onclick="aiEnrichData()" id="btnAiClean" class="flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition-all" title="Perbaiki & Tambah Kalimat Sapaan Otomatis">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                            ✨ AI Data Prep
                         </button>
                         
                         <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
@@ -771,6 +788,54 @@
             ADMIN_AUTH: 'https://script.google.com/macros/s/AKfycby6AuDbQDqghOt-03MZbywbx5DMJEKXth9MgVEDcdFHz3L69u-Qt-5FQBAAXD-TsEo2/exec'
         };
         // =========================================================================
+        
+        // =========================================================================
+        // AI GEMINI INTEGRATION CORE (NATIVE)
+        // =========================================================================
+        const GEMINI_API_KEY = ""; // Kunci API secara dinamis di-inject oleh environment Canvas
+        
+        async function fetchGeminiAPI(userQuery, systemInstruction = "", useJson = false, schema = null) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            if (useJson && schema) {
+                payload.generationConfig = {
+                    responseMimeType: "application/json",
+                    responseSchema: schema
+                };
+            }
+
+            let retries = 5;
+            let delay = 1000;
+            
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                    
+                    const result = await response.json();
+                    let aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!aiText) throw new Error("Format respons AI tidak valid.");
+                    
+                    if (useJson) return JSON.parse(aiText);
+                    return aiText;
+                } catch (error) {
+                    if (i === retries - 1) throw error; // Lempar error jika percobaan terakhir
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2; // Exponential backoff (1s, 2s, 4s, 8s, 16s)
+                }
+            }
+        }
+        // =========================================================================
 
         let rawData = [];         
         let filteredData = [];    
@@ -787,9 +852,9 @@
         let statsTrack = { pending: 0, sent: 0, failed: 0, health: 100, sentA: 0, sentB: 0 };
         let donutChart = null;
         let barChart = null;
-        let waWindow = null; // Variable Global untuk Reusability Tab WA Web
+        let waWindow = null; 
         
-        let selectedMediaBlob = null; // Menyimpan memori lampiran lokal
+        let selectedMediaBlob = null; 
 
         const LS_CAMPAIGN_KEY = 'wa_sec_campaigns_v9';
         const LS_SESSION_KEY = 'wa_sec_recovery_v9';
@@ -805,13 +870,196 @@
             checkRecoverySession();
             analyzeSpamScore(); 
             updateHealthUI();
-            initSecurityWatchdog();
 
             document.getElementById('userApiUrl').value = SecureStore.get('wa_user_api_url') || '';
             document.getElementById('userApiUrl').addEventListener('change', (e) => { SecureStore.set('wa_user_api_url', e.target.value.trim()); });
             
             updateBlacklistCount();
         });
+
+        // ==========================================
+        // FITUR AI 1: AI AUTO-CONFIG (Warming Engine)
+        // ==========================================
+        async function aiAutoConfig() {
+            const ageStr = document.getElementById('aiAccountAge').value; // 'baru', 'sedang', 'lama'
+            const totalLeads = filteredData.length || 100;
+            
+            Swal.fire({
+                title: '🤖 Analisis Profil AI...',
+                html: 'Gemini AI sedang menghitung parameter anti-banned paling optimal berdasarkan umur akun WhatsApp Anda...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+            
+            try {
+                const schema = {
+                    type: "OBJECT",
+                    properties: {
+                        minDelay: { type: "INTEGER" },
+                        maxDelay: { type: "INTEGER" },
+                        batchSize: { type: "INTEGER" },
+                        restTime: { type: "INTEGER" },
+                        interventionLimit: { type: "INTEGER" },
+                        reasoning: { type: "STRING", description: "Penjelasan mengapa batas ini dipilih, WAJIB dalam Bahasa Indonesia." }
+                    }
+                };
+                
+                const prompt = `Umur akun disetel sebagai: '${ageStr}'. Target pengiriman: ${totalLeads} kontak. Hasilkan batas pengiriman broadcast WhatsApp paling optimal untuk menghindari banned. Bersikaplah sangat konservatif (aman) untuk akun 'baru', sedang untuk 'sedang', dan sedikit lebih longgar untuk akun 'lama'. Penjelasan (reasoning) WAJIB menggunakan Bahasa Indonesia yang profesional. Respons harus sesuai dengan skema JSON.`;
+                const sysInstruct = "Anda adalah pakar mekanik anti-spam WhatsApp. Anda harus menghasilkan output JSON yang valid dengan field yang diminta persis.";
+                
+                const aiResult = await fetchGeminiAPI(prompt, sysInstruct, true, schema);
+                
+                // Inject values to UI
+                document.getElementById('minDelay').value = aiResult.minDelay;
+                document.getElementById('maxDelay').value = aiResult.maxDelay;
+                document.getElementById('batchSize').value = aiResult.batchSize;
+                document.getElementById('restTime').value = aiResult.restTime;
+                document.getElementById('interventionLimit').value = aiResult.interventionLimit;
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Konfigurasi AI Terpasang!',
+                    text: aiResult.reasoning,
+                    confirmButtonColor: '#4f46e5'
+                });
+                
+            } catch (err) {
+                console.error("AI Error:", err);
+                Swal.fire('AI Sibuk', 'Gagal memanggil asisten AI. Silakan gunakan pengaturan manual.', 'error');
+            }
+        }
+
+        // ==========================================
+        // FITUR AI 2: AI COPYWRITER (Semantic Spintax)
+        // ==========================================
+        async function aiRewriteMessage() {
+            const rawMsg = document.getElementById('message').value.trim();
+            if (!rawMsg) return Swal.fire('Teks Kosong', 'Ketikkan draft pesan promosi Anda terlebih dahulu.', 'warning');
+            
+            Swal.fire({
+                title: '🧠 AI Sedang Menulis...',
+                html: 'Gemini sedang menciptakan variasi kalimat yang natural dan bebas spam...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+            
+            try {
+                const prompt = `Rewrite the following marketing message into 3 different, highly natural, and friendly variations. Ensure it doesn't sound like a hard-selling bot. Keep any dynamic variables in the exact same {variable} format. Return ONLY the text in exactly this spintax format: {variation 1|variation 2|variation 3}. Do not add any markdown, intro, or outro text.\n\nOriginal Text: "${rawMsg}"`;
+                
+                const aiSpintax = await fetchGeminiAPI(prompt, "You are a master WhatsApp Copywriter.");
+                
+                document.getElementById('message').value = aiSpintax.trim();
+                analyzeSpamScore(); // Panggil pengecekan manual regex lokal sebagai backup UI
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Spintax AI Selesai!',
+                    text: 'Kalimat Anda telah dibuat variatif agar aman dari deteksi pola bot Meta.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } catch (err) {
+                console.error("AI Copywriter Error:", err);
+                Swal.fire('Koneksi Gagal', 'Gemini gagal memproses teks Anda. Silakan coba lagi.', 'error');
+            }
+        }
+        
+        // ==========================================
+        // FITUR AI 3: AI SPAM NLP CHECKER
+        // ==========================================
+        async function aiSpamCheck() {
+            const msg = document.getElementById('message').value.trim();
+            if (!msg) return Swal.fire('Teks Kosong', 'Tidak ada pesan untuk dianalisis.', 'info');
+            
+            Swal.fire({ title: '🤖 Menganalisis Risiko...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
+            try {
+                const schema = {
+                    type: "OBJECT",
+                    properties: {
+                        score: { type: "INTEGER", description: "Spam risk percentage from 0 to 100" },
+                        advice: { type: "STRING", description: "Feedback on how to make it sound more natural and less likely to be blocked" }
+                    }
+                };
+                
+                const prompt = `Analyze this WhatsApp message for spam risk. Check for overly aggressive sales tone, excessive capitalization, urgency triggers, or lack of personalization. Return a spam score (0-100) and short advice in Indonesian.\n\nMessage: "${msg}"`;
+                
+                const result = await fetchGeminiAPI(prompt, "You are an expert Anti-Spam NLP engine.", true, schema);
+                
+                updateSpamUI(result.score, result.advice);
+                Swal.close();
+            } catch (err) {
+                Swal.fire('Analisis Gagal', 'Server AI gagal merespons.', 'error');
+            }
+        }
+
+        // ==========================================
+        // FITUR AI 4 & 5: SMART CSV CLEAN & ICE BREAKER
+        // ==========================================
+        async function aiEnrichData() {
+            if(filteredData.length === 0) return Swal.fire('Data Kosong', 'Muat CSV terlebih dahulu.', 'warning');
+            
+            // Batasi 30 data pertama untuk efisiensi API
+            const maxRows = Math.min(filteredData.length, 30);
+            const dataToProcess = filteredData.slice(0, maxRows).map((row, i) => {
+                return { _id: i, nama_asli: row.nama || row.name || row.no };
+            });
+            
+            const warningText = filteredData.length > 30 ? `<br><br><span class="text-xs text-red-500">Note: Karena limitasi token AI, hanya 30 baris pertama yang akan di-enrich.</span>` : "";
+            
+            const confirm = await Swal.fire({
+                title: '✨ AI Data Enrichment',
+                html: `Sistem akan membaca daftar kontak Anda, lalu secara otomatis:<br><br>1. Memperbaiki penulisan nama (Huruf besar/kecil).<br>2. Menambahkan variabel <b>{sapaan}</b> berdasarkan gender nama.<br>3. Membuat 1 kalimat <b>{icebreaker}</b> basa-basi yang sangat ramah untuk masing-masing kontak.${warningText}`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                confirmButtonText: 'Ya, Proses Data'
+            });
+            
+            if(!confirm.isConfirmed) return;
+            
+            Swal.fire({ title: 'Memproses Data...', text: 'Gemini sedang bekerja. Jangan tutup jendela ini.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
+            try {
+                const schema = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            _id: { type: "INTEGER" },
+                            nama_bersih: { type: "STRING" },
+                            sapaan: { type: "STRING", description: "Bapak, Ibu, Kak, atau Saudara" },
+                            ice_breaker: { type: "STRING", description: "A friendly opening sentence in Indonesian" }
+                        }
+                    }
+                };
+                
+                const prompt = `Process this array of user names. Clean the name (Title Case, remove weird chars), predict their gender to assign a 'sapaan' (Bapak/Ibu/Kak), and write a unique, highly natural, friendly 1-sentence 'ice_breaker' in Indonesian (e.g. 'Semoga harinya menyenangkan ya!', 'Lagi sibuk gak nih?'). Return JSON array exactly matching the input _id.\n\nInput Data:\n${JSON.stringify(dataToProcess)}`;
+                
+                const enrichedResults = await fetchGeminiAPI(prompt, "You are a master data analyst and copywriter.", true, schema);
+                
+                // Menerapkan hasil AI ke dalam filteredData
+                enrichedResults.forEach(res => {
+                    if (filteredData[res._id]) {
+                        filteredData[res._id].nama = res.nama_bersih;
+                        filteredData[res._id].sapaan = res.sapaan;
+                        filteredData[res._id].icebreaker = res.ice_breaker;
+                    }
+                });
+                
+                // Tambahkan variabel baru ke chip UI
+                if(!availableVariables.includes('sapaan')) availableVariables.push('sapaan');
+                if(!availableVariables.includes('icebreaker')) availableVariables.push('icebreaker');
+                renderVariableChips();
+                renderDataPreview(); // Refresh list UI
+                
+                Swal.fire('Data Diperbarui!', 'AI berhasil merapikan nama, mendeteksi gender, dan membuat kalimat Ice Breaker. Anda sekarang bisa menggunakan variabel {sapaan} dan {icebreaker} di teks pesan Anda.', 'success');
+                
+            } catch (err) {
+                console.error("AI Enrichment Error:", err);
+                Swal.fire('Gagal', 'Terjadi kesalahan pada saat AI memproses data. Coba kurangi jumlah baris atau ulangi lagi.', 'error');
+            }
+        }
 
         // ==========================================
         // DATA QUEUE CLEAR (BERSIHKAN DATA)
@@ -945,60 +1193,72 @@
                    URL.revokeObjectURL(url);
                 }
 
-                const item = new ClipboardItem({ 'image/png': blobToCopy });
-                await navigator.clipboard.write([item]);
-                
-                const btnCopy = document.getElementById('btnCopyMedia');
-                btnCopy.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tersalin!`;
-                btnCopy.classList.replace('bg-indigo-600', 'bg-emerald-500');
-                btnCopy.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
+                try {
+                    const item = new ClipboardItem({ 'image/png': blobToCopy });
+                    await navigator.clipboard.write([item]);
+                    
+                    const btnCopy = document.getElementById('btnCopyMedia');
+                    btnCopy.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tersalin!`;
+                    btnCopy.classList.replace('bg-indigo-600', 'bg-emerald-500');
+                    btnCopy.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
 
-                Swal.fire('Gambar Siap di Clipboard!', 'Nanti saat tab WhatsApp Web terbuka, Anda cukup tekan Ctrl+V (Paste) lalu tekan Enter untuk mengirim file asli secara cepat.', 'success');
+                    Swal.fire('Gambar Siap di Clipboard!', 'Nanti saat tab WhatsApp Web terbuka, Anda cukup tekan Ctrl+V (Paste) lalu tekan Enter untuk mengirim file asli secara cepat.', 'success');
+                } catch (apiError) {
+                    console.warn('Clipboard API diblokir:', apiError);
+                    // Fallback Salin Manual
+                    const tempUrl = URL.createObjectURL(blobToCopy);
+                    Swal.fire({
+                        title: 'Salin Manual Diperlukan',
+                        html: '<p class="text-sm mb-4 text-slate-600">Sistem keamanan browser memblokir penyalinan otomatis. Silakan <b>Klik Kanan</b> (atau tekan lama) pada gambar di bawah ini, lalu pilih <b>"Salin Gambar" (Copy Image)</b>.</p><img src="' + tempUrl + '" class="mx-auto max-h-48 border border-slate-300 rounded shadow-md cursor-pointer" alt="Preview">',
+                        icon: 'info',
+                        confirmButtonText: 'Saya Sudah Menyalinnya',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => {
+                        const btnCopy = document.getElementById('btnCopyMedia');
+                        btnCopy.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Siap Paste`;
+                        btnCopy.classList.replace('bg-indigo-600', 'bg-emerald-500');
+                        btnCopy.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
+                        URL.revokeObjectURL(tempUrl);
+                    });
+                }
             } catch (e) {
                 console.error(e);
-                Swal.fire('Gagal Menyalin', 'Browser memblokir akses Clipboard otomatis. Pastikan browser Anda mengizinkan akses Clipboard.', 'error');
+                Swal.fire('Gagal Menyalin', 'Terjadi kesalahan saat memproses gambar.', 'error');
             }
         }
 
         // ==========================================
-        // FITUR 1: MAGIC SPINTAX GENERATOR
+        // MANUAL REGEX SPINTAX GENERATOR (BACKUP)
         // ==========================================
         function applyMagicSpintax() {
             let msg = document.getElementById('message').value;
             if(!msg) return Swal.fire('Teks Kosong', 'Ketikkan pesan promosi Anda terlebih dahulu.', 'info');
             
-            Swal.fire({
-                title: 'Magic Spintax',
-                text: 'Menerapkan variasi kata otomatis untuk menekan Spam Score...',
-                timer: 800,
-                showConfirmButton: false
-            }).then(() => {
-                const dict = [
-                    { regex: /\b(halo|hai)\b/gi, replacement: "{Halo|Hai|Salam|Selamat datang}" },
-                    { regex: /\b(diskon|potongan)\b/gi, replacement: "{diskon|potongan harga|cashback|penawaran spesial}" },
-                    { regex: /\b(murah|terjangkau)\b/gi, replacement: "{murah|sangat terjangkau|hemat|ekonomis}" },
-                    { regex: /\b(beli|pesan)\b/gi, replacement: "{beli|pesan|order|dapatkan|miliki}" },
-                    { regex: /\b(sekarang|hari ini)\b/gi, replacement: "{sekarang|hari ini juga|segera|saat ini juga}" },
-                    { regex: /\b(terima kasih|makasih)\b/gi, replacement: "{terima kasih|thank you|trims}" },
-                    { regex: /\b(info|informasi)\b/gi, replacement: "{info|informasi|detail|keterangan}" }
-                ];
-                
-                let newMsg = msg;
-                dict.forEach(rule => {
-                    newMsg = newMsg.replace(rule.regex, (match, p1, offset, string) => {
-                        let isInBraces = false;
-                        let leftStr = string.substring(0, offset);
-                        let openBraces = (leftStr.match(/\{/g) || []).length;
-                        let closeBraces = (leftStr.match(/\}/g) || []).length;
-                        if(openBraces > closeBraces) isInBraces = true;
-                        
-                        return isInBraces ? match : rule.replacement;
-                    });
+            const dict = [
+                { regex: /\b(halo|hai)\b/gi, replacement: "{Halo|Hai|Salam|Selamat datang}" },
+                { regex: /\b(diskon|potongan)\b/gi, replacement: "{diskon|potongan harga|cashback|penawaran spesial}" },
+                { regex: /\b(murah|terjangkau)\b/gi, replacement: "{murah|sangat terjangkau|hemat|ekonomis}" },
+                { regex: /\b(beli|pesan)\b/gi, replacement: "{beli|pesan|order|dapatkan|miliki}" },
+                { regex: /\b(sekarang|hari ini)\b/gi, replacement: "{sekarang|hari ini juga|segera|saat ini juga}" },
+                { regex: /\b(terima kasih|makasih)\b/gi, replacement: "{terima kasih|thank you|trims}" },
+                { regex: /\b(info|informasi)\b/gi, replacement: "{info|informasi|detail|keterangan}" }
+            ];
+            
+            let newMsg = msg;
+            dict.forEach(rule => {
+                newMsg = newMsg.replace(rule.regex, (match, p1, offset, string) => {
+                    let isInBraces = false;
+                    let leftStr = string.substring(0, offset);
+                    let openBraces = (leftStr.match(/\{/g) || []).length;
+                    let closeBraces = (leftStr.match(/\}/g) || []).length;
+                    if(openBraces > closeBraces) isInBraces = true;
+                    
+                    return isInBraces ? match : rule.replacement;
                 });
-                
-                document.getElementById('message').value = newMsg;
-                analyzeSpamScore();
             });
+            
+            document.getElementById('message').value = newMsg;
+            analyzeSpamScore();
         }
 
         // ==========================================
@@ -1263,27 +1523,6 @@
             }
         }
 
-        function initSecurityWatchdog() {
-            let idleTime = 0;
-            const resetTimer = () => { idleTime = 0; };
-            
-            document.body.addEventListener('mousemove', resetTimer);
-            document.body.addEventListener('keypress', resetTimer);
-            document.body.addEventListener('touchstart', resetTimer);
-
-            setInterval(() => {
-                if (SecureStore.get(LS_AUTH_USER)) {
-                    idleTime++;
-                    if (idleTime >= 15) {
-                        SecureStore.remove(LS_AUTH_USER);
-                        Swal.fire({
-                            icon: 'warning', title: 'Sesi Berakhir', text: 'Anda telah dikeluarkan karena tidak ada aktivitas selama 15 menit.', confirmButtonColor: '#059669'
-                        }).then(() => { window.location.reload(); });
-                    }
-                }
-            }, 60000); 
-        }
-
         let authMode = 'login';
 
         function checkAuth() {
@@ -1431,19 +1670,19 @@
                 scoreText.className = "text-xl sm:text-2xl font-black text-emerald-500 transition-colors";
                 badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 sm:ml-2 inline-block transition-colors";
                 badge.innerText = "SANGAT BAIK";
-                desc.innerText = "Reputasi pengiriman terpantau sangat baik. Intensitas pengiriman aman.";
+                desc.innerText = "Reputasi pengiriman terpantau sangat baik. Intensitas pengiriman wajar.";
             } else if (score >= 35) {
                 bar.className = "bg-amber-500 h-3 rounded-full transition-colors";
                 scoreText.className = "text-xl sm:text-2xl font-black text-amber-500 transition-colors";
                 badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 sm:ml-2 inline-block transition-colors";
                 badge.innerText = "MENURUN (WASPADA)";
-                desc.innerText = "Perhatian: Terlalu banyak pesan berturut-turut atau gagal. Pertimbangkan untuk memperlama durasi Delay.";
+                desc.innerText = "Perhatian: Terlalu banyak pesan berturut-turut atau gagal. Pertimbangkan untuk memperlama durasi Delay atau gunakan AI Copywriter.";
             } else {
                 bar.className = "bg-red-500 h-3 rounded-full transition-colors";
                 scoreText.className = "text-xl sm:text-2xl font-black text-red-500 transition-colors";
                 badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 sm:ml-2 inline-block transition-colors";
                 badge.innerText = "RISIKO BANNED!";
-                desc.innerText = "Sangat Bahaya! Reputasi buruk akibat intensitas spam. Jeda kampanye sekarang juga.";
+                desc.innerText = "Sangat Bahaya! Reputasi buruk akibat intensitas spam. Jeda kampanye sekarang juga dan buat variasi kalimat baru.";
                 
                 if (score <= 25 && isSending && !isPaused) {
                      Swal.fire('SYSTEM AUTO-PAUSE 🛑', 'Quality Rating nomor Anda jatuh ke level Kritis (< 25%).\n\nSistem otomatis menghentikan pengiriman untuk mencegah nomor Anda terblokir permanen oleh Meta. Istirahatkan nomor Anda setidaknya 1-2 jam sebelum melanjutkan.', 'error');
@@ -1452,6 +1691,7 @@
             }
         }
 
+        // FUNGSI ANALISIS REGEX LOKAL (BACKUP)
         function analyzeSpamScore() {
             const text = document.getElementById('message').value || "";
             let score = 0;
@@ -1482,7 +1722,7 @@
 
             score = Math.max(0, Math.min(100, score));
 
-            let finalAdvice = advice.length > 0 ? advice.join(' ') : "Teks terlihat natural dan aman.";
+            let finalAdvice = advice.length > 0 ? advice.join(' ') : "Teks terlihat natural. Klik 'Analisis AI' untuk cek presisi.";
             if (score <= 0 && advice.length === 0) finalAdvice = "Sangat bagus! Gunakan Spintax & {nama} untuk keamanan ekstra.";
             
             updateSpamUI(score, finalAdvice);
@@ -1831,9 +2071,9 @@
             
             document.getElementById('message').value = prof.msg || '';
             document.getElementById('fallbackName').value = prof.fallback || 'Bapak/Ibu';
-            document.getElementById('minDelay').value = prof.minDelay || 15;
-            document.getElementById('maxDelay').value = prof.maxDelay || 45;
-            document.getElementById('batchSize').value = prof.batchSize || 50;
+            document.getElementById('minDelay').value = prof.minDelay || 25;
+            document.getElementById('maxDelay').value = prof.maxDelay || 60;
+            document.getElementById('batchSize').value = prof.batchSize || 25;
             document.getElementById('restTime').value = prof.restTime || 10;
             
             if (document.getElementById('useZeroWidth')) document.getElementById('useZeroWidth').checked = prof.useZeroWidth !== false; 
@@ -1843,7 +2083,7 @@
 
             document.getElementById('workStart').value = prof.workStart || '07:00';
             document.getElementById('workEnd').value = prof.workEnd || '22:00';
-            document.getElementById('interventionLimit').value = prof.interventionLimit || 40;
+            document.getElementById('interventionLimit').value = prof.interventionLimit || 20;
             
             if(prof.messageB !== undefined) document.getElementById('messageB').value = prof.messageB;
             if(prof.useAB !== undefined) {
@@ -2075,8 +2315,8 @@
             
             let avgDelaySeconds = 0;
             
-            const min = parseInt(document.getElementById('minDelay').value) || 15;
-            const max = parseInt(document.getElementById('maxDelay').value) || 45;
+            const min = parseInt(document.getElementById('minDelay').value) || 25;
+            const max = parseInt(document.getElementById('maxDelay').value) || 60;
             avgDelaySeconds = (min + max) / 2;
             if (document.getElementById('useTypingSpeed').checked) avgDelaySeconds += 2; 
 
@@ -2199,7 +2439,7 @@
                 updateBadge("ENGINE RUNNING", "bg-emerald-400"); return; 
             }
             
-            stopRequested = false; isSending = true; isPaused = false; consecutiveMetaErrors = 0;
+            stopRequested = false; isSending = true; isPaused = false;
             waWindow = null; // Reset saat mulai sesi baru
             document.getElementById('searchInput').disabled = true;
             document.getElementById('btnStart').classList.add('hidden');
@@ -2242,7 +2482,7 @@
         }
 
         async function executeSendingLoop() {
-            const batchLimit = parseInt(document.getElementById('batchSize').value) || 50;
+            const batchLimit = parseInt(document.getElementById('batchSize').value) || 25;
             const restMinutes = parseInt(document.getElementById('restTime').value) || 10;
             const interventionLimit = parseInt(document.getElementById('interventionLimit').value) || 0;
             const userApi = document.getElementById('userApiUrl').value.trim();
@@ -2355,8 +2595,8 @@
                     if(!stopRequested && !isPaused) updateBadge("ENGINE RUNNING", "bg-emerald-400");
                 } 
                 else if (currentIndex < filteredData.length - 1 && !stopRequested) {
-                    let min = parseInt(document.getElementById('minDelay').value) || 10;
-                    let max = parseInt(document.getElementById('maxDelay').value) || 30;
+                    let min = parseInt(document.getElementById('minDelay').value) || 25;
+                    let max = parseInt(document.getElementById('maxDelay').value) || 60;
                     
                     if (document.getElementById('useWarmup').checked && currentIndex < 20) {
                         min *= 2; max *= 2;
